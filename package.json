@@ -1,0 +1,20 @@
+{
+  "name": "Handheld Poweer Tools",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "author": "",
+  "license": "GPL-3.0",
+  "private": true,
+  "scripts": {
+    "format": "prettier src --write",
+    "build": "esbuild src/index.ts --bundle --format=esm --outfile=dist/index.js",
+    "build-watch": "esbuild src/index.ts --bundle --format=esm --outfile=dist/index.js --watch"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "esbuild": "^0.14.30",
+    "prettier": "^2.6.2",
+    "prettier-plugin-organize-imports": "^2.3.4",
+    "typescript": "^4.6.3"
+  }
+}
