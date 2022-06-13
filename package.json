@@ -1,16 +1,19 @@
 {
-  "name": "Handheld Poweer Tools",
+  "name": "HandyPT",
   "version": "0.0.1",
   "main": "dist/index.js",
-  "author": "",
+  "author": "Derek J. Clark",
   "license": "GPL-3.0",
   "private": true,
   "scripts": {
     "format": "prettier src --write",
-    "build": "esbuild src/index.ts --bundle --format=esm --outfile=dist/index.js",
-    "build-watch": "esbuild src/index.ts --bundle --format=esm --outfile=dist/index.js --watch"
+    "build": "esbuild src/index.tsx --bundle --format=esm --define:process='{\"env\":{\"NODE_ENV\":\"development\"}}' --jsx-factory=h --jsx-fragment=DocumentFragment --inject:./dom-chef-shim.js --outfile=dist/index.js",
+    "build-watch": "esbuild src/index.tsx --bundle --format=esm --outfile=dist/index.js --watch"
   },
-  "dependencies": {},
+  "dependencies": {
+    "dom-chef": "^5.1.0",
+    "preact": "^10.7.1"
+  },
   "devDependencies": {
     "esbuild": "^0.14.30",
     "prettier": "^2.6.2",

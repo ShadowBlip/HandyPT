@@ -2,7 +2,6 @@ name = "Handheld Power Tools"
 version = "0.0.1"
 link = "https://github.com/ShadowBlip/HandyPT"
 source = "https://github.com/ShadowBlip/HandyPT"
-min-crankshaft-version = "0.1.5"
 
 [author]
 name = "Derek J. Clark"
@@ -11,10 +10,9 @@ link = "https://github.com/pastaq"
 [entrypoints]
 
 	[entrypoints.desktop]
-	library = false
+	library = true
 	menu = false
 
 	[entrypoints.deck]
-	library = false
+	library = true
 	menu = false
-	quick-access = false
