@@ -10,9 +10,10 @@ link = "https://github.com/pastaq"
 [entrypoints]
 
 	[entrypoints.desktop]
-	library = true
+	library = false
 	menu = false
 
 	[entrypoints.deck]
-	library = true
+	library = false
 	menu = false
+	quick-access = true

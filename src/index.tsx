@@ -1,31 +1,26 @@
+import { render } from 'preact';
 import { SMM } from './types/SMM';
+import { PowerTools } from './util';
+import { App } from './view';
+
+const PLUGIN_ID = 'aya-neo-powertools';
+const TITLE = 'Aya Neo Power Tools';
 
 export const load = (smm: SMM) => {
-  console.info('Template plugin loaded!');
+  console.info(`${TITLE} plugin loaded!`);
 
-  const render = async () => {
-    const modal = (
-      <div className="smm-example-modal">
-        <h1>Hello World!</h1>
-        <div>Woo!</div>
-      </div>
-    );
-    return modal;
-  };
+  const pt = new PowerTools(smm);
 
-  smm.MenuManager.addMenuItem({
-    id: 'example',
-    label:
-      // TODO: attach this to SMM
-      (window as any).smmUIMode === 'deck' ? 'Hello World' : 'Hello World',
-    fontSize: 16,
-    render: async (_smm, root) => {
-      root.appendChild(await render());
-    },
+  // Add quickaccess menu
+  smm.InGameMenu.addMenuItem({
+    id: PLUGIN_ID,
+    title: TITLE,
+    render: async (smm: SMM, root: HTMLElement) =>
+      render(<App smm={smm} tools={pt} />, root),
   });
 };
 
 export const unload = (smm: SMM) => {
-  console.info('Template plugin unloaded!');
-  smm.MenuManager.removeMenuItem('example');
+  console.info(`${TITLE} plugin unloaded!`);
+  smm.InGameMenu.removeMenuItem(PLUGIN_ID);
 };

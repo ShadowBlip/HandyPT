@@ -1,13 +1,13 @@
 {
-  "name": "HandyPT",
-  "version": "0.0.1",
+  "name": "crankshaft-plugin-template",
+  "version": "0.1.0",
   "main": "dist/index.js",
-  "author": "Derek J. Clark",
+  "author": "",
   "license": "GPL-3.0",
   "private": true,
   "scripts": {
     "format": "prettier src --write",
-    "build": "esbuild src/index.tsx --bundle --format=esm --define:process='{\"env\":{\"NODE_ENV\":\"development\"}}' --jsx-factory=h --jsx-fragment=DocumentFragment --inject:./dom-chef-shim.js --outfile=dist/index.js",
+    "build": "esbuild src/index.tsx --bundle --format=esm --define:process='{\"env\":{\"NODE_ENV\":\"development\"}}' --jsx-factory=h --jsx-fragment=DocumentFragment --inject:./preact-shim.js --outfile=dist/index.js",
     "build-watch": "esbuild src/index.tsx --bundle --format=esm --outfile=dist/index.js --watch"
   },
   "dependencies": {
