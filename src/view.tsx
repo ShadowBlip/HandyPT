@@ -1,24 +1,38 @@
-import { Component, createRef } from 'preact';
+import { Component, createElement, createRef } from 'preact';
 import { SMM } from './types/SMM';
 import { PowerTools } from './util';
 
-export class App extends Component {
-  pt: PowerTools;
+export interface AppProps {
   smm: SMM;
+  pt: PowerTools;
+}
+
+export class Version extends Component {
+  ref = createRef();
+  render(props: any) {
+    return (
+      <div
+        id="sysID_Lab"
+        class="quickaccesscontrols_Text_1hJkB"
+        ref={this.ref}
+      ></div>
+    );
+  }
+}
+
+export class App extends Component<AppProps> {
   system_label = createRef();
-  constructor(smm: SMM, pt: PowerTools) {
-    super();
-    this.smm = smm;
-    this.pt = pt;
+  constructor(props: AppProps) {
+    super(props);
   }
 
   componentDidMount() {
     if (this.system_label.current) {
-      this.system_label.current.innerText = this.pt.getVersion();
+      this.system_label.current.innerText = this.props.pt.getVersion();
     }
   }
 
-  render(props: any) {
+  render(props: AppProps) {
     return (
       <body style="/*margin:0px;padding:0px;*/ overflow-x: hidden; margin: 0px">
         <div
