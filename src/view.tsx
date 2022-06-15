@@ -1,23 +1,14 @@
-import { Component, createElement, createRef } from 'preact';
+import { Component, ComponentChildren, createRef } from 'preact';
 import { SMM } from './types/SMM';
 import { PowerTools } from './util';
+import { Battery } from './components/Battery';
+import { SystemLabel } from './components/SystemLabel';
 
+// Properties we can pass to the application.
 export interface AppProps {
   smm: SMM;
   pt: PowerTools;
-}
-
-export class Version extends Component {
-  ref = createRef();
-  render(props: any) {
-    return (
-      <div
-        id="sysID_Lab"
-        class="quickaccesscontrols_Text_1hJkB"
-        ref={this.ref}
-      ></div>
-    );
-  }
+  children?: ComponentChildren;
 }
 
 export class App extends Component<AppProps> {
@@ -32,7 +23,7 @@ export class App extends Component<AppProps> {
     }
   }
 
-  render(props: AppProps) {
+  render(props: AppProps, state: any) {
     return (
       <body style="/*margin:0px;padding:0px;*/ overflow-x: hidden; margin: 0px">
         <div
@@ -44,46 +35,9 @@ export class App extends Component<AppProps> {
             <div class="gamepaddialog_FieldLabel_3b0U-"></div>
           </div>
         </div>
-        <div class="quickaccesscontrols_PanelSectionTitle_2iFf9">
-          <div
-            id="sysID_Lab"
-            class="quickaccesscontrols_Text_1hJkB"
-            ref={this.system_label}
-          ></div>
-        </div>
+        <SystemLabel smm={props.smm} pt={props.pt} />
         <div class="Panel Focusable" tabIndex={0}>
-          <div class="quickaccesscontrols_PanelSectionRow_2VQ88">
-            <div
-              class="gamepaddialog_Field_S-_La gamepaddialog_WithFirstRow_qFXi6 gamepaddialog_VerticalAlignCenter_3XNvA gamepaddialog_InlineWrapShiftsChildrenBelow_pHUb6 gamepaddialog_WithBottomSeparator_1lUZx gamepaddialog_StandardPadding_XRBFu gamepaddialog_HighlightOnFocus_wE4V6 Panel Focusable"
-              style="--indent-level: 0"
-            >
-              <div class="gamepaddialog_FieldLabelRow_H9WOq">
-                <div class="gamepaddialog_FieldLabel_3b0U-">System Charge</div>
-                <div class="gamepaddialog_FieldChildren_14_HB">
-                  <div
-                    class="gamepaddialog_LabelFieldValue_5Mylh"
-                    id="batCapacityNow"
-                  ></div>
-                </div>
-              </div>
-            </div>
-            <div
-              class="gamepaddialog_Field_S-_La gamepaddialog_WithFirstRow_qFXi6 gamepaddialog_VerticalAlignCenter_3XNvA gamepaddialog_InlineWrapShiftsChildrenBelow_pHUb6 gamepaddialog_WithBottomSeparator_1lUZx gamepaddialog_StandardPadding_XRBFu gamepaddialog_HighlightOnFocus_wE4V6 Panel Focusable"
-              style="--indent-level: 0"
-            >
-              <div class="gamepaddialog_FieldLabelRow_H9WOq">
-                <div class="gamepaddialog_FieldLabel_3b0U-">
-                  Battery Power Draw
-                </div>
-                <div class="gamepaddialog_FieldChildren_14_HB">
-                  <div
-                    class="gamepaddialog_LabelFieldValue_5Mylh"
-                    id="batPowerDraw"
-                  ></div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <Battery smm={props.smm} pt={props.pt} />
         </div>
         <div
           class="quickaccesscontrols_PanelSection_2C0g0"
