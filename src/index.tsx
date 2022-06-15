@@ -3,8 +3,8 @@ import { SMM } from './types/SMM';
 import { PowerTools } from './util';
 import { App } from './view';
 
-const PLUGIN_ID = 'aya-neo-powertools';
-const TITLE = 'Aya Neo Power Tools';
+const PLUGIN_ID = 'handy-pt';
+const TITLE = 'Handheld Power Tools';
 
 export const load = (smm: SMM) => {
   console.info(`${TITLE} plugin loaded!`);

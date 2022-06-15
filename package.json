@@ -1,6 +1,6 @@
 {
-  "name": "crankshaft-plugin-template",
-  "version": "0.1.0",
+  "name": "handy-pt",
+  "version": "0.0.1",
   "main": "dist/index.js",
   "author": "",
   "license": "GPL-3.0",
