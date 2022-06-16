@@ -1,4 +1,4 @@
-import { Component, createRef } from 'preact';
+import { Component, createRef, RefObject } from 'preact';
 import { SMM } from '../types/SMM';
 import { PowerTools } from '../util';
 export interface TDPControlProperties {
@@ -7,12 +7,34 @@ export interface TDPControlProperties {
 }
 
 export class TDPControl extends Component<TDPControlProperties> {
-  ref = createRef();
+  root:RefObject<HTMLDivElement> = createRef();
+  tdpSlider:RefObject<HTMLDivElement> = createRef();
+  tdpDot:RefObject<HTMLDivElement>  = createRef();
+  tdpNotch0:RefObject<HTMLDivElement>  = createRef();
+  tdpNotch1:RefObject<HTMLDivElement>  = createRef();
+  tdpNotch2:RefObject<HTMLDivElement>  = createRef();
+  tdpNotch3:RefObject<HTMLDivElement>  = createRef();
+  tdpNotch4:RefObject<HTMLDivElement>  = createRef();
+  tdpNotch5:RefObject<HTMLDivElement>  = createRef();
+  tdpNotch6:RefObject<HTMLDivElement>  = createRef();
+  tdpNotchLabel0:RefObject<HTMLDivElement>  = createRef();
+  tdpNotchLabel1:RefObject<HTMLDivElement>  = createRef();
+  tdpNotchLabel2:RefObject<HTMLDivElement>  = createRef();
+  tdpNotchLabel3:RefObject<HTMLDivElement>  = createRef();
+  tdpNotchLabel4:RefObject<HTMLDivElement>  = createRef();
+  tdpNotchLabel5:RefObject<HTMLDivElement>  = createRef();
+  tdpNotchLabel6:RefObject<HTMLDivElement>  = createRef();
   async componentDidMount() {
-    if (this.ref.current) {
+    if (this.root.current) {
       const tdp_notches = await this.props.pt?.get_tdp_notches();
-      console.log('I got it here too!', tdp_notches);
-
+      const html_root: HTMLDivElement = this.root.current;
+      this.tdpNotchLabel0.current!.innerText = tdp_notches!.tdp_notch0_val!.toString();
+      this.tdpNotchLabel1.current!.innerText = tdp_notches!.tdp_notch1_val!.toString();
+      this.tdpNotchLabel2.current!.innerText = tdp_notches!.tdp_notch2_val!.toString();
+      this.tdpNotchLabel3.current!.innerText = tdp_notches!.tdp_notch3_val!.toString();
+      this.tdpNotchLabel4.current!.innerText = tdp_notches!.tdp_notch4_val!.toString();
+      this.tdpNotchLabel5.current!.innerText = tdp_notches!.tdp_notch5_val!.toString();
+      this.tdpNotchLabel6.current!.innerText = tdp_notches!.tdp_notch6_val!.toString();
       // update the battery info every second
     }
   }
@@ -24,7 +46,7 @@ export class TDPControl extends Component<TDPControlProperties> {
       <div
         class="quickaccesscontrols_PanelSection_2C0g0"
         style="padding: 0px 4px"
-        ref={this.ref}
+        ref={this.root}
       >
         <div class="gamepaddialog_Field_S-_La gamepaddialog_WithFirstRow_qFXi6 gamepaddialog_WithChildrenBelow_1u5FT gamepaddialog_VerticalAlignCenter_3XNvA gamepaddialog_InlineWrapShiftsChildrenBelow_pHUb6 gamepaddialog_ChildrenWidthFixed_1ugIU gamepaddialog_ExtraPaddingOnChildrenBelow_5UO-_ gamepaddialog_StandardPadding_XRBFu gamepaddialog_HighlightOnFocus_wE4V6 Panel Focusable">
           <div class="quickaccesscontrols_PanelSectionTitle_2iFf9">
@@ -32,7 +54,7 @@ export class TDPControl extends Component<TDPControlProperties> {
           </div>
           <div class="gamepaddialog_FieldChildren_14_HB">
             <div
-              id="TDPNotch"
+              ref={this.tdpSlider}
               class="gamepadslider_SliderControlAndNotches_1Cccx Focusable"
               tabIndex={0}
               style="--normalized-slider-value: 0.33"
@@ -42,7 +64,7 @@ export class TDPControl extends Component<TDPControlProperties> {
                 <div class="gamepadslider_SliderTrack_Mq25N gamepadslider_SliderHasNotches_2XiAy"></div>
                 <div class="gamepadslider_SliderHandleContainer_1pQZi">
                   <div
-                    id="TDPDot"
+                    ref={this.tdpDot}
                     class="gamepadslider_SliderHandle_2yVKj"
                   ></div>
                 </div>
@@ -50,71 +72,71 @@ export class TDPControl extends Component<TDPControlProperties> {
               <div class="gamepadslider_SliderNotchContainer_2N-a5 Panel Focusable">
                 <div class="gamepadslider_SliderNotch_3x6ve">
                   <div
-                    id="TDPNotch0"
+                    ref={this.tdpNotch0}
                     class="gamepadslider_SliderNotchTick_Fv1Ht gamepadslider_TickActive_j418S"
                   ></div>
                   <div
-                    id="TDPNotch0_Lab"
+                    ref={this.tdpNotchLabel0}
                     class="gamepadslider_SliderNotchLabel_u_sH1"
                   ></div>
                 </div>
                 <div class="gamepadslider_SliderNotch_3x6ve">
                   <div
-                    id="TDPNotch1"
+                    ref={this.tdpNotch1}
                     class="gamepadslider_SliderNotchTick_Fv1Ht gamepadslider_TickActive_j418S"
                   ></div>
                   <div
-                    id="TDPNotch1_Lab"
+                    ref={this.tdpNotchLabel1}
                     class="gamepadslider_SliderNotchLabel_u_sH1"
                   ></div>
                 </div>
                 <div class="gamepadslider_SliderNotch_3x6ve">
                   <div
-                    id="TDPNotch2"
+                    ref={this.tdpNotch2}
                     class="gamepadslider_SliderNotchTick_Fv1Ht gamepadslider_TickActive_j418S"
                   ></div>
                   <div
-                    id="TDPNotch2_Lab"
+                    ref={this.tdpNotchLabel2}
                     class="gamepadslider_SliderNotchLabel_u_sH1"
                   ></div>
                 </div>
                 <div class="gamepadslider_SliderNotch_3x6ve">
                   <div
-                    id="TDPNotch3"
+                    ref={this.tdpNotch3}
                     class="gamepadslider_SliderNotchTick_Fv1Ht gamepadslider_TickActive_j418S"
                   ></div>
                   <div
-                    id="TDPNotch3_Lab"
+                    ref={this.tdpNotchLabel3}
                     class="gamepadslider_SliderNotchLabel_u_sH1"
                   ></div>
                 </div>
                 <div class="gamepadslider_SliderNotch_3x6ve">
                   <div
-                    id="TDPNotch4"
+                    ref={this.tdpNotch4}
                     class="gamepadslider_SliderNotchTick_Fv1Ht gamepadslider_TickActive_j418S"
                   ></div>
                   <div
-                    id="TDPNotch4_Lab"
+                    ref={this.tdpNotchLabel4}
                     class="gamepadslider_SliderNotchLabel_u_sH1"
                   ></div>
                 </div>
                 <div class="gamepadslider_SliderNotch_3x6ve">
                   <div
-                    id="TDPNotch5"
+                    ref={this.tdpNotch5}
                     class="gamepadslider_SliderNotchTick_Fv1Ht gamepadslider_TickActive_j418S"
                   ></div>
                   <div
-                    id="TDPNotch5_Lab"
+                    ref={this.tdpNotchLabel5}
                     class="gamepadslider_SliderNotchLabel_u_sH1"
                   ></div>
                 </div>
                 <div class="gamepadslider_SliderNotch_3x6ve">
                   <div
-                    id="TDPNotch6"
+                    ref={this.tdpNotch6}
                     class="gamepadslider_SliderNotchTick_Fv1Ht gamepadslider_TickActive_j418S"
                   ></div>
                   <div
-                    id="TDPNotch6_Lab"
+                    ref={this.tdpNotchLabel6}
                     class="gamepadslider_SliderNotchLabel_u_sH1"
                   ></div>
                 </div>
