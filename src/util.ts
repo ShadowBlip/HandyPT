@@ -104,7 +104,7 @@ export class PowerTools {
 
   async getRyzenadj(): Promise<string> {
     const homeDir = await this.getHomeDir();
-    return `${homeDir}/.var/app/space.crankshaft.Crankshaft/data/crankshaft/plugins/Aya-Neo-Power-Tools/bin/ryzenadj`;
+    return `${homeDir}/.var/app/space.crankshaft.Crankshaft/data/crankshaft/plugins/HandyPT/bin/ryzenadj`;
   }
 
   // Returns the version strings
@@ -137,7 +137,7 @@ export class PowerTools {
     const cmd = await this.smm.Exec.run('bash', ['-c', args]);
     const output = cmd.stdout;
     const all_props = output.split('\n');
-
+     
     const prop_row = all_props.find((prop_row) => {
       if (!prop_row.includes(prop)) {
         return false;

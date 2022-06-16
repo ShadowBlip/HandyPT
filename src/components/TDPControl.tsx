@@ -7,35 +7,54 @@ export interface TDPControlProperties {
 }
 
 export class TDPControl extends Component<TDPControlProperties> {
-  root:RefObject<HTMLDivElement> = createRef();
-  tdpSlider:RefObject<HTMLDivElement> = createRef();
-  tdpDot:RefObject<HTMLDivElement>  = createRef();
-  tdpNotch0:RefObject<HTMLDivElement>  = createRef();
-  tdpNotch1:RefObject<HTMLDivElement>  = createRef();
-  tdpNotch2:RefObject<HTMLDivElement>  = createRef();
-  tdpNotch3:RefObject<HTMLDivElement>  = createRef();
-  tdpNotch4:RefObject<HTMLDivElement>  = createRef();
-  tdpNotch5:RefObject<HTMLDivElement>  = createRef();
-  tdpNotch6:RefObject<HTMLDivElement>  = createRef();
-  tdpNotchLabel0:RefObject<HTMLDivElement>  = createRef();
-  tdpNotchLabel1:RefObject<HTMLDivElement>  = createRef();
-  tdpNotchLabel2:RefObject<HTMLDivElement>  = createRef();
-  tdpNotchLabel3:RefObject<HTMLDivElement>  = createRef();
-  tdpNotchLabel4:RefObject<HTMLDivElement>  = createRef();
-  tdpNotchLabel5:RefObject<HTMLDivElement>  = createRef();
-  tdpNotchLabel6:RefObject<HTMLDivElement>  = createRef();
+  default_tdp: number = -1;
+  root: RefObject<HTMLDivElement> = createRef();
+  tdpSlider: RefObject<HTMLDivElement> = createRef();
+  tdpDot: RefObject<HTMLDivElement> = createRef();
+  tdpNotch0: RefObject<HTMLDivElement> = createRef();
+  tdpNotch1: RefObject<HTMLDivElement> = createRef();
+  tdpNotch2: RefObject<HTMLDivElement> = createRef();
+  tdpNotch3: RefObject<HTMLDivElement> = createRef();
+  tdpNotch4: RefObject<HTMLDivElement> = createRef();
+  tdpNotch5: RefObject<HTMLDivElement> = createRef();
+  tdpNotch6: RefObject<HTMLDivElement> = createRef();
+  tdpNotchLabel0: RefObject<HTMLDivElement> = createRef();
+  tdpNotchLabel1: RefObject<HTMLDivElement> = createRef();
+  tdpNotchLabel2: RefObject<HTMLDivElement> = createRef();
+  tdpNotchLabel3: RefObject<HTMLDivElement> = createRef();
+  tdpNotchLabel4: RefObject<HTMLDivElement> = createRef();
+  tdpNotchLabel5: RefObject<HTMLDivElement> = createRef();
+  tdpNotchLabel6: RefObject<HTMLDivElement> = createRef();
   async componentDidMount() {
     if (this.root.current) {
+      // Get and set our notch values
       const tdp_notches = await this.props.pt?.get_tdp_notches();
       const html_root: HTMLDivElement = this.root.current;
-      this.tdpNotchLabel0.current!.innerText = tdp_notches!.tdp_notch0_val!.toString();
-      this.tdpNotchLabel1.current!.innerText = tdp_notches!.tdp_notch1_val!.toString();
-      this.tdpNotchLabel2.current!.innerText = tdp_notches!.tdp_notch2_val!.toString();
-      this.tdpNotchLabel3.current!.innerText = tdp_notches!.tdp_notch3_val!.toString();
-      this.tdpNotchLabel4.current!.innerText = tdp_notches!.tdp_notch4_val!.toString();
-      this.tdpNotchLabel5.current!.innerText = tdp_notches!.tdp_notch5_val!.toString();
-      this.tdpNotchLabel6.current!.innerText = tdp_notches!.tdp_notch6_val!.toString();
-      // update the battery info every second
+      this.tdpNotchLabel0.current!.innerText =
+        tdp_notches!.tdp_notch0_val!.toString();
+      this.tdpNotchLabel1.current!.innerText =
+        tdp_notches!.tdp_notch1_val!.toString();
+      this.tdpNotchLabel2.current!.innerText =
+        tdp_notches!.tdp_notch2_val!.toString();
+      this.tdpNotchLabel3.current!.innerText =
+        tdp_notches!.tdp_notch3_val!.toString();
+      this.tdpNotchLabel4.current!.innerText =
+        tdp_notches!.tdp_notch4_val!.toString();
+      this.tdpNotchLabel5.current!.innerText =
+        tdp_notches!.tdp_notch5_val!.toString();
+      this.tdpNotchLabel6.current!.innerText =
+        tdp_notches!.tdp_notch6_val!.toString();
+
+      this.default_tdp = tdp_notches!.tdp_notch3_val!;
+      // Get our current TDP
+      const current_tdp = await this.props.pt?.readGPUProp('0x0000');
+      if (current_tdp != this.default_tdp) {
+        await this.props.pt?.setGPUProp(this.default_tdp, 'a');
+        await this.props.pt?.setGPUProp(this.default_tdp, 'b');
+        await this.props.pt?.setGPUProp(this.default_tdp, 'c');
+        const new_tdp = await this.props.pt?.readGPUProp('0x0000');
+        console.log('TDP was ', current_tdp, ' and was set to ', new_tdp);
+      }
     }
   }
 
