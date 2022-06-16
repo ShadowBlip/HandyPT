@@ -1,5 +1,9 @@
-import { Component, createRef } from 'preact';
+import { Component, ComponentChildren, createRef } from 'preact';
 import { AppProps } from '../view';
+export interface LabelProperties {
+  children?: ComponentChildren;
+}
+
 
 // Battery shit
 export class Battery extends Component<AppProps> {
@@ -36,7 +40,7 @@ export class Battery extends Component<AppProps> {
   // update will be called every second, refreshing the battery capacity and
   // power draw.
   async update() {
-    console.log('Updating battery stats');
+    //console.log('Updating battery stats');
     const batCapacityNow: HTMLDivElement = this.capacityRef.current;
     const batPowerDraw: HTMLDivElement = this.powerDrawRef.current;
     const chargeNow = await this.getCharge('energy_now');
@@ -56,7 +60,7 @@ export class Battery extends Component<AppProps> {
       // update the battery info every second
       this.timer = setInterval(async () => {
         await this.update();
-      }, 1000);
+      }, 999999);
     }
   }
 

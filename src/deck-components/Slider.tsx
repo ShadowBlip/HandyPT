@@ -1,3 +1,5 @@
+import { Component } from 'preact';
+
 export interface SliderProps {
   value: number;
   min?: number;
@@ -16,13 +18,15 @@ export interface SliderProps {
   onChange?(value: number): void;
 }
 
-export function SliderControl(props: SliderProps) {
-  return (
-    <div class="gamepadslider_SliderControl_3o137">
-      <div class="gamepadslider_SliderTrack_Mq25N gamepadslider_SliderHasNotches_2XiAy"></div>
-      <div class="gamepadslider_SliderHandleContainer_1pQZi">
-        <div id="Handle" class="gamepadslider_SliderHandle_2yVKj"></div>
+export class SliderControl extends Component<SliderProps> {
+  render(props: SliderProps) {
+    return (
+      <div class="gamepadslider_SliderControl_3o137">
+        <div class="gamepadslider_SliderTrack_Mq25N gamepadslider_SliderHasNotches_2XiAy"></div>
+        <div class="gamepadslider_SliderHandleContainer_1pQZi">
+          <div id="Handle" class="gamepadslider_SliderHandle_2yVKj"></div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 }

@@ -18,14 +18,14 @@ const gpu_prop_dict: GPUProps = {
   c: '0x0010', // SLOW PPT
 };
 
-interface GPUNotches {
-  gpuclk_notch0_val?: number;
-  gpuclk_notch1_val?: number;
-  gpuclk_notch2_val?: number;
-  gpuclk_notch3_val?: number;
-  gpuclk_notch4_val?: number;
-  gpuclk_notch5_val?: number;
-  gpuclk_notch6_val?: number;
+interface TDPNotches {
+  tdp_notch0_val?: number;
+  tdp_notch1_val?: number;
+  tdp_notch2_val?: number;
+  tdp_notch3_val?: number;
+  tdp_notch4_val?: number;
+  tdp_notch5_val?: number;
+  tdp_notch6_val?: number;
 }
 
 export class PowerTools {
@@ -33,22 +33,68 @@ export class PowerTools {
   smm: SMM;
 
   // Backend properties
-  gpuclk_notches: GPUNotches = {};
-  modified_settings = false;
-  persistent = false;
-  sys_id = '';
-  tdp_delta = 2;
-  tdp_notches = {};
-  use_gpuclk = false;
+  gpu_model: string = '';
+  modified_settings: boolean = false;
+  persistent: boolean = false;
+  sys_id: string = '';
+  tdp_delta: number = 0;
+  tdp_notches: TDPNotches = {};
 
   // From front-end
-  currentTDPNotch = 0;
-  gpuClkEnabled = false;
-  tdpDeltaSliderVal = 0;
-  tdpSliderVal = 0;
+  currentTDPNotch: number = 0;
+  tdpDeltaSliderVal: number = 0;
+  tdpSliderVal: number = 0;
 
   constructor(smm: SMM) {
     this.smm = smm;
+  }
+
+  async get_tdp_notches(): Promise<TDPNotches> {
+    const cpuid = await this.getCPUID();
+    switch (cpuid) {
+      // 4500U max TDP 25w, increment by 3W
+      case 'AMD Ryzen 7 4500U with Radeon Graphics': {
+        this.tdp_notches.tdp_notch0_val = 7;
+        this.tdp_notches.tdp_notch1_val = 10;
+        this.tdp_notches.tdp_notch2_val = 13;
+        this.tdp_notches.tdp_notch3_val = 16;
+        this.tdp_notches.tdp_notch4_val = 19;
+        this.tdp_notches.tdp_notch5_val = 22;
+        this.tdp_notches.tdp_notch6_val = 25;
+        break;
+      }
+      // 4800U Mmax TDP 30w, increment by 3/4W
+      case 'AMD Ryzen 7 4800U with Radeon Graphics': {
+        this.tdp_notches.tdp_notch0_val = 7;
+        this.tdp_notches.tdp_notch1_val = 10;
+        this.tdp_notches.tdp_notch2_val = 14;
+        this.tdp_notches.tdp_notch3_val = 18;
+        this.tdp_notches.tdp_notch4_val = 22;
+        this.tdp_notches.tdp_notch5_val = 26;
+        this.tdp_notches.tdp_notch6_val = 30;
+        break;
+      }
+      // 5825U max TDP 32W, increment by 6/4W
+      case 'AMD Ryzen 7 5825U with Radeon Graphics': {
+        this.tdp_notches.tdp_notch0_val = 7;
+        this.tdp_notches.tdp_notch1_val = 10;
+        this.tdp_notches.tdp_notch2_val = 14;
+        this.tdp_notches.tdp_notch3_val = 18;
+        this.tdp_notches.tdp_notch4_val = 22;
+        this.tdp_notches.tdp_notch5_val = 28;
+        this.tdp_notches.tdp_notch6_val = 32;
+        break;
+      }
+    }
+    return this.tdp_notches;
+  }
+
+  async getCPUID(): Promise<string> {
+    const cpuid = await this.smm.Exec.run('bash', [
+      '-c',
+      'lscpu | grep "Model name" | cut -d : -f 2 | xargs',
+    ]);
+    return cpuid.stdout;
   }
 
   async getHomeDir(): Promise<string> {
@@ -74,68 +120,6 @@ export class PowerTools {
     return await this.smm.FS.readFile(
       '/sys/devices/virtual/dmi/id/product_name'
     );
-  }
-
-  async getGPUClkNotches(): Promise<GPUNotches> {
-    if (this.sys_id === '') {
-      this.sys_id = await this.readSysID();
-    }
-
-    // Founders & 2021 MAX GPU CLK 1500, increment by 200Mhz
-    const incr200Mhz = [
-      'AYANEO 2021',
-      'AYA NEO 2021',
-      'AYANEO FOUNDERS',
-      'AYA NEO FOUNDERS',
-      'AYANEO FOUNDER',
-      'AYA NEO FOUNDER',
-    ];
-    if (incr200Mhz.includes(this.sys_id)) {
-      this.gpuclk_notches.gpuclk_notch0_val = 200;
-      this.gpuclk_notches.gpuclk_notch1_val = 400;
-      this.gpuclk_notches.gpuclk_notch2_val = 600;
-      this.gpuclk_notches.gpuclk_notch3_val = 800;
-      this.gpuclk_notches.gpuclk_notch4_val = 1000;
-      this.gpuclk_notches.gpuclk_notch5_val = 1200;
-      this.gpuclk_notches.gpuclk_notch6_val = 1500;
-    }
-
-    // 2021 PRO MAX GPU CLK 1750, increment by 250Mhz
-    const incr250Mhz = [
-      'AYANEO 2021 Pro Retro Power',
-      'AYA NEO 2021 Pro Retro Power',
-      'AYANEO 2021 Pro',
-      'AYA NEO 2021 Pro',
-    ];
-    if (incr250Mhz.includes(this.sys_id)) {
-      this.gpuclk_notches.gpuclk_notch0_val = 250;
-      this.gpuclk_notches.gpuclk_notch1_val = 500;
-      this.gpuclk_notches.gpuclk_notch2_val = 750;
-      this.gpuclk_notches.gpuclk_notch3_val = 1000;
-      this.gpuclk_notches.gpuclk_notch4_val = 1250;
-      this.gpuclk_notches.gpuclk_notch5_val = 1500;
-      this.gpuclk_notches.gpuclk_notch6_val = 1750;
-    }
-    // NEXT MAX GPU CLK 2000, increment by 300Mhz
-    const incr300Mhz = [
-      'NEXT',
-      'AYANEO NEXT',
-      'AYA NEO NEXT',
-      'NEXT Pro',
-      'AYANEO NEXT Pro',
-      'AYA NEO NEXT Pro',
-    ];
-    if (incr300Mhz.includes(this.sys_id)) {
-      this.gpuclk_notches.gpuclk_notch0_val = 250;
-      this.gpuclk_notches.gpuclk_notch1_val = 500;
-      this.gpuclk_notches.gpuclk_notch2_val = 750;
-      this.gpuclk_notches.gpuclk_notch3_val = 1000;
-      this.gpuclk_notches.gpuclk_notch4_val = 1250;
-      this.gpuclk_notches.gpuclk_notch5_val = 1500;
-      this.gpuclk_notches.gpuclk_notch6_val = 1750;
-    }
-
-    return this.gpuclk_notches;
   }
 
   // Set the given GPU property.
@@ -184,48 +168,6 @@ export class PowerTools {
   }
 }
 
-function getGPUProp(prop) {
-  return call_plugin_method('get_gpu_prop', { prop: prop });
-}
-
-function getChargeNow() {
-  return call_plugin_method('get_charge_now', {});
-}
-
-function getChargeFull() {
-  return call_plugin_method('get_charge_full', {});
-}
-
-function getPowerDraw() {
-  return call_plugin_method('get_power_draw', {});
-}
-
-function setPersistent(value) {
-  return call_plugin_method('set_persistent', { enabled: value });
-}
-
-function getPersistent() {
-  return call_plugin_method('get_persistent', {});
-}
-
-function getTDPNotches() {
-  return call_plugin_method('get_tdp_notches', {});
-}
-
-function getTDPDelta() {
-  return call_plugin_method('get_tdp_delta', {});
-}
-
-function setTDPDelta(new_delta) {
-  return call_plugin_method('set_tdp_delta', { new_delta: new_delta });
-}
-
-function getSysID() {
-  return call_plugin_method('get_sys_id', {});
-}
-
-// other logic
-
 async function onReady() {
   await onViewReady();
   await onReadyGPU();
@@ -262,24 +204,6 @@ function setToggleState(toggle, state) {
 
 function getToggleState(toggle) {
   return toggle.classList.contains(TOGGLE_ON_CLASS);
-}
-
-async function updateBatteryStats() {
-  // console.log("Updating battery stats")\
-  let batCapacityNow = document.getElementById('batCapacityNow');
-  let batPowerDraw = document.getElementById('batPowerDraw');
-  let sysIDLab = document.getElementById('sysID_Lab');
-  let chargeNow = await getChargeNow();
-  let chargeFull = await getChargeFull();
-  let powerDraw = await getPowerDraw();
-  let sysID = await getSysID();
-  batCapacityNow.innerText =
-    ((7.7 * chargeNow) / 1000000).toFixed(2).toString() +
-    ' Wh (' +
-    ((100 * chargeNow) / chargeFull).toFixed(0).toString() +
-    '%)';
-  batPowerDraw.innerText = (powerDraw / 1000000).toString() + 'W';
-  sysIDLab.innerText = sysID.toString();
 }
 
 async function onReadyGPU() {
