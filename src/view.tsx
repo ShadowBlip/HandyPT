@@ -3,7 +3,8 @@ import { SMM } from './types/SMM';
 import { PowerTools } from './util';
 import { Battery } from './components/Battery';
 import { SystemLabel } from './components/SystemLabel';
-import {TDPControl} from './components/TDPControl';
+import { TDPControl } from './components/TDPControl';
+import { Slider } from './deck-components';
 
 // Properties we can pass to the application.
 export interface AppProps {
@@ -40,7 +41,15 @@ export class App extends Component<AppProps> {
         <div class="Panel Focusable" tabIndex={0}>
           <Battery smm={props.smm} pt={props.pt} />
         </div>
-	<TDPControl smm={props.smm} pt={props.pt} />
+        <Slider
+          value={10}
+          min={5}
+          max={10}
+          label="BOOOO BOY"
+          notchCount={4}
+          showValue={true}
+        />
+        <TDPControl smm={props.smm} pt={props.pt} />
         <div
           class="quickaccesscontrols_PanelSection_2C0g0"
           style="padding: 0px 4px"
