@@ -7,7 +7,8 @@ export interface TDPControlProperties {
 }
 
 export class TDPControl extends Component<TDPControlProperties> {
-  default_tdp: any = null;
+  default_tdp: number = -1;
+  tdp_boost_delta: number = 0;
   root: RefObject<HTMLDivElement> = createRef();
   tdpSlider: RefObject<HTMLDivElement> = createRef();
   tdpDot: RefObject<HTMLDivElement> = createRef();
@@ -25,6 +26,8 @@ export class TDPControl extends Component<TDPControlProperties> {
   tdpNotchLabel4: RefObject<HTMLDivElement> = createRef();
   tdpNotchLabel5: RefObject<HTMLDivElement> = createRef();
   tdpNotchLabel6: RefObject<HTMLDivElement> = createRef();
+  tdpNotchRefs: any = [ this.tdpNotch0, this.tdpNotch1, this.tdpNotch2, this.tdpNotch3, this.tdpNotch4, this.tdpNotch5, this.tdpNotch6 ] 
+
   async componentDidMount() {
     if (this.root.current) {
       // Get and set our notch values
@@ -50,26 +53,51 @@ export class TDPControl extends Component<TDPControlProperties> {
 
       // TODO: this will need to change once persistance is enabled.
       if (current_tdp != tdp_notches!.tdp_notch3_val!) {
-        await this.setTDPNotch(tdp_notches!.tdp_notch3_val);
+        await this.setTDP(tdp_notches!.tdp_notch3_val);
       }
     }
   }
   
-  async setTDPNotch(setTDP: number) {
-    
-    const current_tdp = await this.props.pt?.readGPUProp('0x0000');
+  // Set the TDP to the given value
+  async setTDP(setTDP: number) {
     //set the correct TDP value
     await this.props.pt?.setGPUProp(setTDP, 'a');
-    await this.props.pt?.setGPUProp(setTDP, 'b');
+    await this.props.pt?.setGPUProp(setTDP + this.tdp_boost_delta, 'b');
     await this.props.pt?.setGPUProp(setTDP, 'c');
     const new_tdp = await this.props.pt?.readGPUProp('0x0000');
-    console.log('TDP was ', current_tdp, ' and was set to ', new_tdp);
     // identify the correct index of the element
     // move the parent slider to the correct value
   }
-    
+
+  async setTDPNotch(notchIndex: number) {
+  }
+   
+  async getClosestNotch() {
+  }
+  
+  async onTDPTouchStart(e) {
+    console.log('touch start!', e)
+  }
+
+  async onTDPOver(e) {
+    console.log('Mouse over!', e)
+  }
+
+  async onTDPMove(e) {
+    console.log('Mouse move!', e)
+  }
+
+  async onTDPDown(e) {
+    console.log('Mouse down!', e)
+    console.log('Hope this works', e.srcElement.scrollWidth)//this.tdpSlider.current!.scrollWidth)
+  }
+
+  async onTDPUp(e) {
+    console.log('Mouse up!', e)
+  }
   // Runs when this component is unloaded
-  async componentWillUnmount() {}
+  async componentWillUnmount() {
+  }
 
   // renders the GUI
   render(properties: TDPControlProperties) {
@@ -89,6 +117,12 @@ export class TDPControl extends Component<TDPControlProperties> {
               class="gamepadslider_SliderControlAndNotches_1Cccx Focusable"
               tabIndex={0}
               style="--normalized-slider-value: 0.33"
+              onMouseMove={this.onTDPMove}
+              onMouseMove={this.onTDPOver}
+              onMouseDown={this.onTDPDown}
+              onMouseUp={this.onTDPUp}
+              onTouchStart={this.onTDPTouchStart}
+              id="TestID"
             >
               <div class="gamepaddialog_FieldDescription_2OJfk">GPU TDP</div>
               <div class="gamepadslider_SliderControl_3o137">
