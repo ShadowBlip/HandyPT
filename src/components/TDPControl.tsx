@@ -7,7 +7,7 @@ export interface TDPControlProperties {
 }
 
 export class TDPControl extends Component<TDPControlProperties> {
-  default_tdp: number = -1;
+  default_tdp: any = null;
   root: RefObject<HTMLDivElement> = createRef();
   tdpSlider: RefObject<HTMLDivElement> = createRef();
   tdpDot: RefObject<HTMLDivElement> = createRef();
@@ -45,21 +45,33 @@ export class TDPControl extends Component<TDPControlProperties> {
       this.tdpNotchLabel6.current!.innerText =
         tdp_notches!.tdp_notch6_val!.toString();
 
-      this.default_tdp = tdp_notches!.tdp_notch3_val!;
       // Get our current TDP
       const current_tdp = await this.props.pt?.readGPUProp('0x0000');
-      if (current_tdp != this.default_tdp) {
-        await this.props.pt?.setGPUProp(this.default_tdp, 'a');
-        await this.props.pt?.setGPUProp(this.default_tdp, 'b');
-        await this.props.pt?.setGPUProp(this.default_tdp, 'c');
-        const new_tdp = await this.props.pt?.readGPUProp('0x0000');
-        console.log('TDP was ', current_tdp, ' and was set to ', new_tdp);
+
+      // TODO: this will need to change once persistance is enabled.
+      if (current_tdp != tdp_notches!.tdp_notch3_val!) {
+        await this.setTDPNotch(tdp_notches!.tdp_notch3_val);
       }
     }
   }
-
+  
+  async setTDPNotch(setTDP: number) {
+    
+    const current_tdp = await this.props.pt?.readGPUProp('0x0000');
+    //set the correct TDP value
+    await this.props.pt?.setGPUProp(setTDP, 'a');
+    await this.props.pt?.setGPUProp(setTDP, 'b');
+    await this.props.pt?.setGPUProp(setTDP, 'c');
+    const new_tdp = await this.props.pt?.readGPUProp('0x0000');
+    console.log('TDP was ', current_tdp, ' and was set to ', new_tdp);
+    // identify the correct index of the element
+    // move the parent slider to the correct value
+  }
+    
   // Runs when this component is unloaded
   async componentWillUnmount() {}
+
+  // renders the GUI
   render(properties: TDPControlProperties) {
     return (
       <div
