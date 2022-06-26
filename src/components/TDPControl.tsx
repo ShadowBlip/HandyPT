@@ -7,40 +7,56 @@ export interface TDPControlProperties {
 }
 
 export class TDPControl extends Component<TDPControlProperties> {
-  default_tdp: number = -1;
-  tdp_boost_delta: number = 0;
+  current_tdp: number = 5;
+  current_boost: number = 0;
+  tdp_default_val: number = -1;
+  tdp_max_val: number = -1;
+  tdp_min_val: number = -1;
+
+  // RefObjects
+  boostLabel: RefObject<HTMLDivElement> = createRef();
+  boostSlider: RefObject<HTMLDivElement> = createRef();
   root: RefObject<HTMLDivElement> = createRef();
+  tdpLabel: RefObject<HTMLDivElement> = createRef();
+  tdpSlider: RefObject<HTMLDivElement> = createRef();
 
   async componentDidMount() {
     if (this.root.current) {
-      // Get and set our notch values
-      const tdp_notches = await this.props.pt?.get_tdp_notches();
+      // Get and set our range values
+      const tdp_range = await this.props.pt?.get_tdp_range();
 
-      // Get our current TDP
-      const current_tdp = await this.props.pt?.readGPUProp('0x0000');
+      this.tdp_max_val = tdp_range!.tdp_max_val;
+      this.tdp_min_val = tdp_range!.tdp_min_val;
+      this.tdp_default_val = tdp_range!.tdp_default_val;
 
-      // TODO: this will need to change once persistance is enabled.
-      if (current_tdp != tdp_notches!.tdp_notch3_val!) {
-        await this.setTDP(tdp_notches!.tdp_notch3_val);
+      // Get our current TDP and set to default or persisted value.
+      this.current_tdp = await this.props.pt?.readGPUProp('0x0000');
+      if (this.current_tdp != this.tdp_default_val) {
+        await this.setTDP(this.tdp_default_val);
       }
+      let tdp_slider_percent =
+        (this.tdp_default_val - this.tdp_min_val) /
+        (this.tdp_max_val - this.tdp_min_val);
+      console.log('possible percent', tdp_slider_percent, this.tdpSlider);
+      this.tdpLabel.current.innerText =
+        'GPU TDP: ' + this.current_tdp.toString();
+      this.boostLabel.current.innerText =
+        'GPU TDP Boost: +' + this.current_boost.toString();
+      this.tdpSlider.current!.setAttribute(
+        'style',
+        `--normalized-slider-value: ${tdp_slider_percent}`
+      );
+      this.boostSlider.current!.setAttribute(
+        'style',
+        `--normalized-slider-value: 0`
+      );
     }
   }
 
-  // Set the TDP to the given value
-  async setTDP(tdp_val: number) {
-    //set the correct TDP value
-    await this.props.pt?.setGPUProp(tdp_val, 'a');
-    await this.props.pt?.setGPUProp(tdp_val, 'c');
-    await this.props.pt?.setGPUProp(tdp_val + this.tdp_boost_delta, 'b');
-  }
+  // Runs when this component is unloaded
+  async componentWillUnmount() {}
 
-  // Set the boost TDP to the given value
-  async setBoost(boost_val: number) {
-    this.tdp_boost_delta = boost_val;
-    const current_tdp = await this.props.pt?.readGPUProp('0x0000');
-    await this.setTDP(current_tdp);
-  }
-
+  // GENERICS
   // gets the relative touch percentage from a given touch event.
   async getTouchPercent(e) {
     let target_rect = e.target.getBoundingClientRect();
@@ -50,22 +66,50 @@ export class TDPControl extends Component<TDPControlProperties> {
     return touch_percent;
   }
 
+  // Only set the TDP when we are done sliding.
+  async onEndSlide(e) {
+    await this.setTDP(this.current_tdp);
+  }
+
+  // TDP SECTION
   // Handle touch events on TDP slider.
   async onSlideTDP(e) {
-    let parent = e.srcElement.parentNode;
+    let parentNode = null
+    if (e.srcElement.id === 'tdpSlider') {
+      parentNode = e.srcElement;
+    } else {
+      parentNode = e.srcElement.parentNode;
+    }
     let touch_percent = await this.getTouchPercent(e);
 
     //TODO get min/max of the srcElement
-    let tdp_val = Math.ceil(touch_percent * (30 - 7) + 7);
+    let tdp_val = Math.ceil(
+      touch_percent * (this.tdp_max_val - this.tdp_min_val) + this.tdp_min_val
+    );
     let style = `--normalized-slider-value: ${touch_percent}`;
 
     //set params
-    parent.setAttribute('style', style);
-    await this.setTDP(tdp_val);
+    parentNode.setAttribute('style', style);
+    this.current_tdp = tdp_val;
+    this.tdpLabel.current.innerText = 'GPU TDP: ' + this.current_tdp.toString();
   }
 
+  // Set the TDP to the given value
+  async setTDP(tdp_val: number) {
+    //set the correct TDP value
+    await this.props.pt?.setGPUProp(tdp_val, 'a');
+    await this.props.pt?.setGPUProp(tdp_val, 'c');
+    await this.props.pt?.setGPUProp(tdp_val + this.current_boost, 'b');
+  }
+
+  // BOOST SECTION
   async onSlideBoost(e) {
-    let parent = e.srcElement.parentNode;
+    let parentNode = null
+    if (e.srcElement.id === 'boostSlider') {
+      parentNode = e.srcElement;
+    } else {
+      parentNode = e.srcElement.parentNode;
+    }
     let touch_percent = await this.getTouchPercent(e);
 
     //TODO get min/max of the srcElement
@@ -73,12 +117,11 @@ export class TDPControl extends Component<TDPControlProperties> {
     let style = `--normalized-slider-value: ${touch_percent}`;
 
     //set params
-    parent.setAttribute('style', style);
-    await this.setBoost(boost_val);
+    parentNode.setAttribute('style', style);
+    this.current_boost = boost_val;
+    this.boostLabel.current.innerText =
+      'GPU TDP Boost: +' + this.current_boost.toString();
   }
-
-  // Runs when this component is unloaded
-  async componentWillUnmount() {}
 
   // renders the GUI
   render(properties: TDPControlProperties) {
@@ -93,39 +136,46 @@ export class TDPControl extends Component<TDPControlProperties> {
             <div class="quickaccesscontrols_Text_1hJkB">TDP Settings</div>
           </div>
           <div class="gamepaddialog_FieldChildren_14_HB">
-            <div class="gamepaddialog_FieldDescription_2OJfk">GPU TDP</div>
+            <div
+              class="gamepaddialog_FieldDescription_2OJfk"
+              ref={this.tdpLabel}
+            />
             <div
               class="gamepadslider_SliderControl_3o137"
-              style="--normalized-slider-value: 0.33"
+              ref={this.tdpSlider}
+              ontouchstart={(e) => this.onSlideTDP(e)}
+              ontouchmove={(e) => this.onSlideTDP(e)}
+              ontouchend={(e) => this.onEndSlide(e)}
+              id="tdpSlider"
             >
               <div
                 class="gamepadslider_SliderTrack_Mq25N gamepadslider_SliderHasNotches_2XiAy"
-                ontouchstart={(e) => this.onSlideTDP(e)}
-                ontouchmove={(e) => this.onSlideTDP(e)}
+                id="tdpSliderTrack"
               />
               <div class="gamepadslider_SliderHandleContainer_1pQZi">
-                <div
-                  ref={this.tdpDot}
-                  class="gamepadslider_SliderHandle_2yVKj"
-                ></div>
+                <div class="gamepadslider_SliderHandle_2yVKj" />
               </div>
             </div>
           </div>
           <div class="gamepaddialog_FieldChildren_14_HB">
-            <div class="gamepaddialog_FieldDescription_2OJfk">
-              GPU TDP Boost Limit
-            </div>
-            <div class="gamepadslider_SliderControl_3o137">
+            <div
+              class="gamepaddialog_FieldDescription_2OJfk"
+              ref={this.boostLabel}
+            />
+            <div
+              class="gamepadslider_SliderControl_3o137"
+              ref={this.boostSlider}
+              ontouchstart={(e) => this.onSlideBoost(e)}
+              ontouchmove={(e) => this.onSlideBoost(e)}
+              ontouchend={(e) => this.onEndSlide(e)}
+              id="boostSlider"
+            >
               <div
                 class="gamepadslider_SliderTrack_Mq25N gamepadslider_SliderHasNotches_2XiAy"
-                ontouchstart={(e) => this.onSlideBoost(e)}
-                ontouchmove={(e) => this.onSlideBoost(e)}
+                id="boostSliderTrack"
               />
               <div class="gamepadslider_SliderHandleContainer_1pQZi">
-                <div
-                  id="TDPDeltaDot"
-                  class="gamepadslider_SliderHandle_2yVKj"
-                ></div>
+                <div class="gamepadslider_SliderHandle_2yVKj" />
               </div>
             </div>
           </div>

@@ -60,7 +60,7 @@ export class Battery extends Component<AppProps> {
       // update the battery info every second
       this.timer = setInterval(async () => {
         await this.update();
-      }, 30000); //msec
+      }, 5000); //msec
     }
   }
 
