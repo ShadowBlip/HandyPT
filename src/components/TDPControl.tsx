@@ -10,43 +10,11 @@ export class TDPControl extends Component<TDPControlProperties> {
   default_tdp: number = -1;
   tdp_boost_delta: number = 0;
   root: RefObject<HTMLDivElement> = createRef();
-  tdpSlider: RefObject<HTMLDivElement> = createRef();
-  tdpDot: RefObject<HTMLDivElement> = createRef();
-  tdpNotch0: RefObject<HTMLDivElement> = createRef();
-  tdpNotch1: RefObject<HTMLDivElement> = createRef();
-  tdpNotch2: RefObject<HTMLDivElement> = createRef();
-  tdpNotch3: RefObject<HTMLDivElement> = createRef();
-  tdpNotch4: RefObject<HTMLDivElement> = createRef();
-  tdpNotch5: RefObject<HTMLDivElement> = createRef();
-  tdpNotch6: RefObject<HTMLDivElement> = createRef();
-  tdpNotchLabel0: RefObject<HTMLDivElement> = createRef();
-  tdpNotchLabel1: RefObject<HTMLDivElement> = createRef();
-  tdpNotchLabel2: RefObject<HTMLDivElement> = createRef();
-  tdpNotchLabel3: RefObject<HTMLDivElement> = createRef();
-  tdpNotchLabel4: RefObject<HTMLDivElement> = createRef();
-  tdpNotchLabel5: RefObject<HTMLDivElement> = createRef();
-  tdpNotchLabel6: RefObject<HTMLDivElement> = createRef();
-  tdpNotchRefs: any = [ this.tdpNotch0, this.tdpNotch1, this.tdpNotch2, this.tdpNotch3, this.tdpNotch4, this.tdpNotch5, this.tdpNotch6 ] 
 
   async componentDidMount() {
     if (this.root.current) {
       // Get and set our notch values
       const tdp_notches = await this.props.pt?.get_tdp_notches();
-      const html_root: HTMLDivElement = this.root.current;
-      this.tdpNotchLabel0.current!.innerText =
-        tdp_notches!.tdp_notch0_val!.toString();
-      this.tdpNotchLabel1.current!.innerText =
-        tdp_notches!.tdp_notch1_val!.toString();
-      this.tdpNotchLabel2.current!.innerText =
-        tdp_notches!.tdp_notch2_val!.toString();
-      this.tdpNotchLabel3.current!.innerText =
-        tdp_notches!.tdp_notch3_val!.toString();
-      this.tdpNotchLabel4.current!.innerText =
-        tdp_notches!.tdp_notch4_val!.toString();
-      this.tdpNotchLabel5.current!.innerText =
-        tdp_notches!.tdp_notch5_val!.toString();
-      this.tdpNotchLabel6.current!.innerText =
-        tdp_notches!.tdp_notch6_val!.toString();
 
       // Get our current TDP
       const current_tdp = await this.props.pt?.readGPUProp('0x0000');
@@ -57,47 +25,60 @@ export class TDPControl extends Component<TDPControlProperties> {
       }
     }
   }
-  
+
   // Set the TDP to the given value
-  async setTDP(setTDP: number) {
+  async setTDP(tdp_val: number) {
     //set the correct TDP value
-    await this.props.pt?.setGPUProp(setTDP, 'a');
-    await this.props.pt?.setGPUProp(setTDP + this.tdp_boost_delta, 'b');
-    await this.props.pt?.setGPUProp(setTDP, 'c');
-    const new_tdp = await this.props.pt?.readGPUProp('0x0000');
-    // identify the correct index of the element
-    // move the parent slider to the correct value
+    await this.props.pt?.setGPUProp(tdp_val, 'a');
+    await this.props.pt?.setGPUProp(tdp_val, 'c');
+    await this.props.pt?.setGPUProp(tdp_val + this.tdp_boost_delta, 'b');
   }
 
-  async setTDPNotch(notchIndex: number) {
-  }
-   
-  async getClosestNotch() {
-  }
-  
-  async onTDPTouchStart(e) {
-    console.log('touch start!', e)
+  // Set the boost TDP to the given value
+  async setBoost(boost_val: number) {
+    this.tdp_boost_delta = boost_val;
+    const current_tdp = await this.props.pt?.readGPUProp('0x0000');
+    await this.setTDP(current_tdp);
   }
 
-  async onTDPOver(e) {
-    console.log('Mouse over!', e)
+  // gets the relative touch percentage from a given touch event.
+  async getTouchPercent(e) {
+    let target_rect = e.target.getBoundingClientRect();
+    let touch_location = e.touches[0].clientX - target_rect.x;
+    let touch_raw = touch_location / target_rect.width;
+    let touch_percent = Math.min(Math.max(touch_raw, 0), 1);
+    return touch_percent;
   }
 
-  async onTDPMove(e) {
-    console.log('Mouse move!', e)
+  // Handle touch events on TDP slider.
+  async onSlideTDP(e) {
+    let parent = e.srcElement.parentNode;
+    let touch_percent = await this.getTouchPercent(e);
+
+    //TODO get min/max of the srcElement
+    let tdp_val = Math.ceil(touch_percent * (30 - 7) + 7);
+    let style = `--normalized-slider-value: ${touch_percent}`;
+
+    //set params
+    parent.setAttribute('style', style);
+    await this.setTDP(tdp_val);
   }
 
-  async onTDPDown(e) {
-    console.log('Mouse down!', e)
-    console.log('Hope this works', e.srcElement.scrollWidth)//this.tdpSlider.current!.scrollWidth)
+  async onSlideBoost(e) {
+    let parent = e.srcElement.parentNode;
+    let touch_percent = await this.getTouchPercent(e);
+
+    //TODO get min/max of the srcElement
+    let boost_val = Math.ceil(touch_percent * (7 - 0) + 0);
+    let style = `--normalized-slider-value: ${touch_percent}`;
+
+    //set params
+    parent.setAttribute('style', style);
+    await this.setBoost(boost_val);
   }
 
-  async onTDPUp(e) {
-    console.log('Mouse up!', e)
-  }
   // Runs when this component is unloaded
-  async componentWillUnmount() {
-  }
+  async componentWillUnmount() {}
 
   // renders the GUI
   render(properties: TDPControlProperties) {
@@ -112,170 +93,39 @@ export class TDPControl extends Component<TDPControlProperties> {
             <div class="quickaccesscontrols_Text_1hJkB">TDP Settings</div>
           </div>
           <div class="gamepaddialog_FieldChildren_14_HB">
+            <div class="gamepaddialog_FieldDescription_2OJfk">GPU TDP</div>
             <div
-              ref={this.tdpSlider}
-              class="gamepadslider_SliderControlAndNotches_1Cccx Focusable"
-              tabIndex={0}
+              class="gamepadslider_SliderControl_3o137"
               style="--normalized-slider-value: 0.33"
-              onMouseMove={this.onTDPMove}
-              onMouseMove={this.onTDPOver}
-              onMouseDown={this.onTDPDown}
-              onMouseUp={this.onTDPUp}
-              onTouchStart={this.onTDPTouchStart}
-              id="TestID"
             >
-              <div class="gamepaddialog_FieldDescription_2OJfk">GPU TDP</div>
-              <div class="gamepadslider_SliderControl_3o137">
-                <div class="gamepadslider_SliderTrack_Mq25N gamepadslider_SliderHasNotches_2XiAy"></div>
-                <div class="gamepadslider_SliderHandleContainer_1pQZi">
-                  <div
-                    ref={this.tdpDot}
-                    class="gamepadslider_SliderHandle_2yVKj"
-                  ></div>
-                </div>
-              </div>
-              <div class="gamepadslider_SliderNotchContainer_2N-a5 Panel Focusable">
-                <div class="gamepadslider_SliderNotch_3x6ve">
-                  <div
-                    ref={this.tdpNotch0}
-                    class="gamepadslider_SliderNotchTick_Fv1Ht gamepadslider_TickActive_j418S"
-                  ></div>
-                  <div
-                    ref={this.tdpNotchLabel0}
-                    class="gamepadslider_SliderNotchLabel_u_sH1"
-                  ></div>
-                </div>
-                <div class="gamepadslider_SliderNotch_3x6ve">
-                  <div
-                    ref={this.tdpNotch1}
-                    class="gamepadslider_SliderNotchTick_Fv1Ht gamepadslider_TickActive_j418S"
-                  ></div>
-                  <div
-                    ref={this.tdpNotchLabel1}
-                    class="gamepadslider_SliderNotchLabel_u_sH1"
-                  ></div>
-                </div>
-                <div class="gamepadslider_SliderNotch_3x6ve">
-                  <div
-                    ref={this.tdpNotch2}
-                    class="gamepadslider_SliderNotchTick_Fv1Ht gamepadslider_TickActive_j418S"
-                  ></div>
-                  <div
-                    ref={this.tdpNotchLabel2}
-                    class="gamepadslider_SliderNotchLabel_u_sH1"
-                  ></div>
-                </div>
-                <div class="gamepadslider_SliderNotch_3x6ve">
-                  <div
-                    ref={this.tdpNotch3}
-                    class="gamepadslider_SliderNotchTick_Fv1Ht gamepadslider_TickActive_j418S"
-                  ></div>
-                  <div
-                    ref={this.tdpNotchLabel3}
-                    class="gamepadslider_SliderNotchLabel_u_sH1"
-                  ></div>
-                </div>
-                <div class="gamepadslider_SliderNotch_3x6ve">
-                  <div
-                    ref={this.tdpNotch4}
-                    class="gamepadslider_SliderNotchTick_Fv1Ht gamepadslider_TickActive_j418S"
-                  ></div>
-                  <div
-                    ref={this.tdpNotchLabel4}
-                    class="gamepadslider_SliderNotchLabel_u_sH1"
-                  ></div>
-                </div>
-                <div class="gamepadslider_SliderNotch_3x6ve">
-                  <div
-                    ref={this.tdpNotch5}
-                    class="gamepadslider_SliderNotchTick_Fv1Ht gamepadslider_TickActive_j418S"
-                  ></div>
-                  <div
-                    ref={this.tdpNotchLabel5}
-                    class="gamepadslider_SliderNotchLabel_u_sH1"
-                  ></div>
-                </div>
-                <div class="gamepadslider_SliderNotch_3x6ve">
-                  <div
-                    ref={this.tdpNotch6}
-                    class="gamepadslider_SliderNotchTick_Fv1Ht gamepadslider_TickActive_j418S"
-                  ></div>
-                  <div
-                    ref={this.tdpNotchLabel6}
-                    class="gamepadslider_SliderNotchLabel_u_sH1"
-                  ></div>
-                </div>
+              <div
+                class="gamepadslider_SliderTrack_Mq25N gamepadslider_SliderHasNotches_2XiAy"
+                ontouchstart={(e) => this.onSlideTDP(e)}
+                ontouchmove={(e) => this.onSlideTDP(e)}
+              />
+              <div class="gamepadslider_SliderHandleContainer_1pQZi">
+                <div
+                  ref={this.tdpDot}
+                  class="gamepadslider_SliderHandle_2yVKj"
+                ></div>
               </div>
             </div>
           </div>
           <div class="gamepaddialog_FieldChildren_14_HB">
-            <div
-              id="TDPDeltaNotch"
-              class="gamepadslider_SliderControlAndNotches_1Cccx Focusable"
-              tabIndex={0}
-              style="--normalized-slider-value: 0.33"
-            >
-              <div class="gamepaddialog_FieldDescription_2OJfk">
-                GPU TDP Boost Limit
-              </div>
-              <div class="gamepadslider_SliderControl_3o137">
-                <div class="gamepadslider_SliderTrack_Mq25N gamepadslider_SliderHasNotches_2XiAy"></div>
-                <div class="gamepadslider_SliderHandleContainer_1pQZi">
-                  <div
-                    id="TDPDeltaDot"
-                    class="gamepadslider_SliderHandle_2yVKj"
-                  ></div>
-                </div>
-              </div>
-              <div class="gamepadslider_SliderNotchContainer_2N-a5 Panel Focusable">
-                <div class="gamepadslider_SliderNotch_3x6ve">
-                  <div
-                    id="TDPDeltaNotch0"
-                    class="gamepadslider_SliderNotchTick_Fv1Ht gamepadslider_TickActive_j418S"
-                  ></div>
-                  <div
-                    id="TDPDeltaNotch0_Lab"
-                    class="gamepadslider_SliderNotchLabel_u_sH1"
-                  >
-                    +2
-                  </div>
-                </div>
-                <div class="gamepadslider_SliderNotch_3x6ve">
-                  <div
-                    id="TDPDeltaNotch1"
-                    class="gamepadslider_SliderNotchTick_Fv1Ht gamepadslider_TickActive_j418S"
-                  ></div>
-                  <div
-                    id="TDPDeltaNotch1_Lab"
-                    class="gamepadslider_SliderNotchLabel_u_sH1"
-                  >
-                    +3
-                  </div>
-                </div>
-                <div class="gamepadslider_SliderNotch_3x6ve">
-                  <div
-                    id="TDPDeltaNotch2"
-                    class="gamepadslider_SliderNotchTick_Fv1Ht gamepadslider_TickActive_j418S"
-                  ></div>
-                  <div
-                    id="TDPDeltaNotch2_Lab"
-                    class="gamepadslider_SliderNotchLabel_u_sH1"
-                  >
-                    +4
-                  </div>
-                </div>
-                <div class="gamepadslider_SliderNotch_3x6ve">
-                  <div
-                    id="TDPDeltaNotch3"
-                    class="gamepadslider_SliderNotchTick_Fv1Ht gamepadslider_TickActive_j418S"
-                  ></div>
-                  <div
-                    id="TDPDeltaNotch3_Lab"
-                    class="gamepadslider_SliderNotchLabel_u_sH1"
-                  >
-                    +5
-                  </div>
-                </div>
+            <div class="gamepaddialog_FieldDescription_2OJfk">
+              GPU TDP Boost Limit
+            </div>
+            <div class="gamepadslider_SliderControl_3o137">
+              <div
+                class="gamepadslider_SliderTrack_Mq25N gamepadslider_SliderHasNotches_2XiAy"
+                ontouchstart={(e) => this.onSlideBoost(e)}
+                ontouchmove={(e) => this.onSlideBoost(e)}
+              />
+              <div class="gamepadslider_SliderHandleContainer_1pQZi">
+                <div
+                  id="TDPDeltaDot"
+                  class="gamepadslider_SliderHandle_2yVKj"
+                ></div>
               </div>
             </div>
           </div>
