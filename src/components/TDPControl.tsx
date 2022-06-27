@@ -32,12 +32,11 @@ export class TDPControl extends Component<TDPControlProperties> {
       // Get our current TDP and set to default or persisted value.
       this.current_tdp = await this.props.pt?.readGPUProp('0x0000');
       if (this.current_tdp != this.tdp_default_val) {
-        await this.setTDP(this.tdp_default_val);
+        this.setTDP(this.tdp_default_val);
       }
       let tdp_slider_percent =
         (this.tdp_default_val - this.tdp_min_val) /
         (this.tdp_max_val - this.tdp_min_val);
-      console.log('possible percent', tdp_slider_percent, this.tdpSlider);
       this.tdpLabel.current.innerText =
         'GPU TDP: ' + this.current_tdp.toString();
       this.boostLabel.current.innerText =
@@ -58,12 +57,21 @@ export class TDPControl extends Component<TDPControlProperties> {
 
   // GENERICS
   // gets the relative touch percentage from a given touch event.
-  async getTouchPercent(e) {
-    let target_rect = e.target.getBoundingClientRect();
-    let touch_location = e.touches[0].clientX - target_rect.x;
-    let touch_raw = touch_location / target_rect.width;
+  getEventPercent(event_location, object_width) {
+    let touch_raw = event_location / object_width;
     let touch_percent = Math.min(Math.max(touch_raw, 0), 1);
     return touch_percent;
+  }
+  // returns the slider's actual parent node. If the slidertrack parent node
+  // activated the event, returns that instead.
+  getParentNode(e, id) {
+    let parentNode = null;
+    if (e.srcElement.id === id) {
+      parentNode = e.srcElement;
+    } else {
+      parentNode = e.srcElement.parentNode;
+    }
+    return parentNode;
   }
 
   // Only set the TDP when we are done sliding.
@@ -71,22 +79,43 @@ export class TDPControl extends Component<TDPControlProperties> {
     await this.setTDP(this.current_tdp);
   }
 
-  // TDP SECTION
-  // Handle touch events on TDP slider.
-  async onSlideTDP(e) {
-    let parentNode = null
-    if (e.srcElement.id === 'tdpSlider') {
-      parentNode = e.srcElement;
-    } else {
-      parentNode = e.srcElement.parentNode;
-    }
-    let touch_percent = await this.getTouchPercent(e);
+  // Set the TDP to the given value
+  async setTDP(tdp_val: number) {
+    //set the correct TDP value
+    await this.props.pt?.setGPUProp(tdp_val, 'a');
+    await this.props.pt?.setGPUProp(tdp_val + this.current_boost, 'b');
+    await this.props.pt?.setGPUProp(tdp_val + this.current_boost, 'c');
+  }
 
-    //TODO get min/max of the srcElement
-    let tdp_val = Math.ceil(
-      touch_percent * (this.tdp_max_val - this.tdp_min_val) + this.tdp_min_val
+  // TDP SLIDER SECTION
+  // Handle touch events on TDP slider.
+  async onTouchSlideTDP(e) {
+    let parentNode = this.getParentNode(e, 'tdpSlider');
+    let target_rect = e.target.getBoundingClientRect();
+    let touch_location = e.touches[0].clientX - target_rect.x;
+    let touch_percent = this.getEventPercent(
+      touch_location,
+      target_rect.x
     );
-    let style = `--normalized-slider-value: ${touch_percent}`;
+    this.setTDPSliderState(touch_percent, parentNode);
+  }
+  // Handle mouse events on TDP slider.
+  async onMouseSlideTDP(e) {
+    let parentNode = this.getParentNode(e, 'tdpSlider');
+    let touch_location = e.layerX;
+    let touch_percent = this.getEventPercent(
+      touch_location,
+      parentNode.clientWidth
+    );
+    this.setTDPSliderState(touch_percent, parentNode);
+  }
+
+  // Decorate the TDP slider and set global vars
+  setTDPSliderState(event_percent, parentNode) {
+    let tdp_val = Math.ceil(
+      event_percent * (this.tdp_max_val - this.tdp_min_val) + this.tdp_min_val
+    );
+    let style = `--normalized-slider-value: ${event_percent}`;
 
     //set params
     parentNode.setAttribute('style', style);
@@ -94,27 +123,35 @@ export class TDPControl extends Component<TDPControlProperties> {
     this.tdpLabel.current.innerText = 'GPU TDP: ' + this.current_tdp.toString();
   }
 
-  // Set the TDP to the given value
-  async setTDP(tdp_val: number) {
-    //set the correct TDP value
-    await this.props.pt?.setGPUProp(tdp_val, 'a');
-    await this.props.pt?.setGPUProp(tdp_val, 'c');
-    await this.props.pt?.setGPUProp(tdp_val + this.current_boost, 'b');
+  // BOOST SECTION
+  // Handle touch events on boost slider.
+  async onTouchSlideBoost(e) {
+    let parentNode = this.getParentNode(e, 'boostSlider');
+    let target_rect = e.target.getBoundingClientRect();
+    let touch_location = e.touches[0].clientX - target_rect.x;
+    let touch_percent = this.getEventPercent(
+      touch_location,
+      target_rect.x
+    );
+    this.setBoostSliderState(touch_percent, parentNode);
   }
 
-  // BOOST SECTION
-  async onSlideBoost(e) {
-    let parentNode = null
-    if (e.srcElement.id === 'boostSlider') {
-      parentNode = e.srcElement;
-    } else {
-      parentNode = e.srcElement.parentNode;
-    }
-    let touch_percent = await this.getTouchPercent(e);
+  // Handle mouse events on boost slider.
+  async onMouseSlideBoost(e) {
+    let parentNode = this.getParentNode(e, 'boostSlider');
+    let touch_location = e.layerX;
+    let touch_percent = this.getEventPercent(
+      touch_location,
+      parentNode.clientWidth
+    );
+    this.setBoostSliderState(touch_percent, parentNode);
+  }
 
+  // Decorate the boost slider and set global vars
+  setBoostSliderState(event_percent, parentNode) {
     //TODO get min/max of the srcElement
-    let boost_val = Math.ceil(touch_percent * (7 - 0) + 0);
-    let style = `--normalized-slider-value: ${touch_percent}`;
+    let boost_val = Math.ceil(event_percent * (7 - 0) + 0);
+    let style = `--normalized-slider-value: ${event_percent}`;
 
     //set params
     parentNode.setAttribute('style', style);
@@ -123,6 +160,7 @@ export class TDPControl extends Component<TDPControlProperties> {
       'GPU TDP Boost: +' + this.current_boost.toString();
   }
 
+  // VIEW SECTION
   // renders the GUI
   render(properties: TDPControlProperties) {
     return (
@@ -143,9 +181,13 @@ export class TDPControl extends Component<TDPControlProperties> {
             <div
               class="gamepadslider_SliderControl_3o137"
               ref={this.tdpSlider}
-              ontouchstart={(e) => this.onSlideTDP(e)}
-              ontouchmove={(e) => this.onSlideTDP(e)}
+              ontouchstart={(e) => this.onTouchSlideTDP(e)}
+              ontouchmove={(e) => this.onTouchSlideTDP(e)}
+              onMouseDown={(e) => this.onMouseSlideTDP(e)}
+              onMouseMove={(e) => this.onMouseSlideTDP(e)}
               ontouchend={(e) => this.onEndSlide(e)}
+              onMouseUp={(e) => this.onEndSlide(e)}
+              onMouseOut={(e) => this.onEndSlide(e)}
               id="tdpSlider"
             >
               <div
@@ -165,9 +207,13 @@ export class TDPControl extends Component<TDPControlProperties> {
             <div
               class="gamepadslider_SliderControl_3o137"
               ref={this.boostSlider}
-              ontouchstart={(e) => this.onSlideBoost(e)}
-              ontouchmove={(e) => this.onSlideBoost(e)}
+              ontouchstart={(e) => this.onTouchSlideBoost(e)}
+              ontouchmove={(e) => this.onTouchSlideBoost(e)}
+              onMouseDown={(e) => this.onMouseSlideBoost(e)}
+              onMouseMove={(e) => this.onMouseSlideBoost(e)}
               ontouchend={(e) => this.onEndSlide(e)}
+              onMouseUp={(e) => this.onEndSlide(e)}
+              onMouseOut={(e) => this.onEndSlide(e)}
               id="boostSlider"
             >
               <div

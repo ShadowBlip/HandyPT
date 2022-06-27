@@ -3,7 +3,7 @@ import { SMM } from './types/SMM';
 import { PowerTools } from './util';
 import { Battery } from './components/Battery';
 import { SystemLabel } from './components/SystemLabel';
-import {TDPControl} from './components/TDPControl';
+import { TDPControl } from './components/TDPControl';
 
 // Properties we can pass to the application.
 export interface AppProps {
@@ -28,10 +28,9 @@ export class App extends Component<AppProps> {
     return (
       <body style="/*margin:0px;padding:0px;*/ overflow-x: hidden; margin: 0px">
         <div
-          class="quickaccesscontrols_PanelSection_2C0g0"
+          class="quickaccesscontrols_PanelSection_2C0g0 Focusable"
           style="padding: 0px 4px; margin-bottom: 0px"
         >
-          <div class="quickaccesscontrols_PanelSectionTitle_2iFf9"></div>
           <div class="quickaccesscontrols_PanelSectionTitle_2iFf9">
             <div class="gamepaddialog_FieldLabel_3b0U-"></div>
           </div>
@@ -40,7 +39,7 @@ export class App extends Component<AppProps> {
         <div class="Panel Focusable" tabIndex={0}>
           <Battery smm={props.smm} pt={props.pt} />
         </div>
-	<TDPControl smm={props.smm} pt={props.pt} />
+        <TDPControl smm={props.smm} pt={props.pt} />
         <div
           class="quickaccesscontrols_PanelSection_2C0g0"
           style="padding: 0px 4px"
@@ -81,9 +80,7 @@ export class App extends Component<AppProps> {
               style="--indent-level: 0"
             >
               <div class="gamepaddialog_FieldLabelRow_H9WOq">
-                <div class="gamepaddialog_FieldLabel_3b0U-">
-                  Aya Neo Power Tools
-                </div>
+                <div class="gamepaddialog_FieldLabel_3b0U-">HandyPT</div>
                 <div class="gamepaddialog_FieldChildren_14_HB">
                   <div
                     class="gamepaddialog_LabelFieldValue_5Mylh"
