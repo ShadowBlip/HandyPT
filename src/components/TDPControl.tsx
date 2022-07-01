@@ -23,7 +23,7 @@ export class TDPControl extends Component<TDPControlProperties> {
   async componentDidMount() {
     if (this.root.current) {
       // Get and set our range values
-      const tdp_range = await this.props.pt?.get_tdp_range();
+      const tdp_range = await this.props.pt?.getTDPRange();
 
       this.tdp_max_val = tdp_range!.tdp_max_val;
       this.tdp_min_val = tdp_range!.tdp_min_val;

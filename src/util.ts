@@ -2,7 +2,7 @@ import { FunctionComponent } from 'preact';
 import { SMM } from './types/SMM';
 
 const TDP_DELTA_NOTCHES = 4;
-const VERSION = '0.0.1';
+const VERSION = '0.1.0-rc3';
 const TDP_NOTCHES = 7;
 const TOGGLE_ON_CLASS = 'gamepaddialog_On_3ld7T';
 
@@ -40,7 +40,7 @@ export class PowerTools {
     this.smm = smm;
   }
 
-  async get_tdp_range(): Promise<TDPRange> {
+  async getTDPRange(): Promise<TDPRange> {
     const cpuid = await this.getCPUID();
     switch (cpuid) {
       // 4500U/5800U max TDP 25w
