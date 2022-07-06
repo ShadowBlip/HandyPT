@@ -8,7 +8,7 @@ CRANKSHAFT_DATA_PATH ?= .var/app/space.crankshaft.Crankshaft/data/crankshaft
 
 # SSH Configuration
 SSH_USER ?= gamer
-SSH_HOST ?= chimeraos
+SSH_HOST ?= 192.168.0.176
 SSH_MOUNT_PATH ?= /tmp/remote
 SSH_CRANKSHAFT_DATA_PATH ?= /home/$(SSH_USER)/$(CRANKSHAFT_DATA_PATH)
 

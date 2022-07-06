@@ -11,19 +11,6 @@ export class Battery extends Component<AppProps> {
   capacityRef = createRef();
   powerDrawRef = createRef();
 
-  // gets the current charge by device
-  async getCharge(device: string): Promise<number> {
-    try {
-      const output = await this.props.smm.FS.readFile(
-        `/sys/class/hwmon/hwmon2/device/${device}`
-      );
-      return parseInt(output.trim());
-    } catch (err) {
-      console.log(`Error fetching charge: ${err}`);
-      return 0;
-    }
-  }
-
   // gets the current power by device
   async getPower(device: string): Promise<number> {
     try {
@@ -43,8 +30,8 @@ export class Battery extends Component<AppProps> {
     //console.log('Updating battery stats');
     const batCapacityNow: HTMLDivElement = this.capacityRef.current;
     const batPowerDraw: HTMLDivElement = this.powerDrawRef.current;
-    const chargeNow = await this.getCharge('energy_now');
-    const chargeFull = await this.getCharge('energy_full');
+    const chargeNow = await this.getPower('energy_now');
+    const chargeFull = await this.getPower('energy_full');
     const powerDraw = await this.getPower('power_now');
     batCapacityNow.innerText =
       ((7.7 * chargeNow) / 1000000).toFixed(2).toString() +

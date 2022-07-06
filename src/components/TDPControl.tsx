@@ -7,7 +7,7 @@ export interface TDPControlProperties {
 }
 
 export class TDPControl extends Component<TDPControlProperties> {
-  current_tdp: number = 5;
+  current_tdp: number = -1;
   current_boost: number = 0;
   tdp_default_val: number = -1;
   tdp_max_val: number = -1;
@@ -82,9 +82,11 @@ export class TDPControl extends Component<TDPControlProperties> {
   // Set the TDP to the given value
   async setTDP(tdp_val: number) {
     //set the correct TDP value
+    let fast_ppt = tdp_val + this.current_boost;
+    let slow_ppt = tdp_val + Math.ceil(this.current_boost / 2);
     await this.props.pt?.setGPUProp(tdp_val, 'a');
-    await this.props.pt?.setGPUProp(tdp_val + this.current_boost, 'b');
-    await this.props.pt?.setGPUProp(tdp_val + this.current_boost, 'c');
+    await this.props.pt?.setGPUProp(fast_ppt, 'b');
+    await this.props.pt?.setGPUProp(slow_ppt, 'c');
   }
 
   // TDP SLIDER SECTION
@@ -93,10 +95,7 @@ export class TDPControl extends Component<TDPControlProperties> {
     let parentNode = this.getParentNode(e, 'tdpSlider');
     let target_rect = e.target.getBoundingClientRect();
     let touch_location = e.touches[0].clientX - target_rect.x;
-    let touch_percent = this.getEventPercent(
-      touch_location,
-      target_rect.x
-    );
+    let touch_percent = this.getEventPercent(touch_location, target_rect.x);
     this.setTDPSliderState(touch_percent, parentNode);
   }
   // Handle mouse events on TDP slider.
@@ -129,10 +128,7 @@ export class TDPControl extends Component<TDPControlProperties> {
     let parentNode = this.getParentNode(e, 'boostSlider');
     let target_rect = e.target.getBoundingClientRect();
     let touch_location = e.touches[0].clientX - target_rect.x;
-    let touch_percent = this.getEventPercent(
-      touch_location,
-      target_rect.x
-    );
+    let touch_percent = this.getEventPercent(touch_location, target_rect.x);
     this.setBoostSliderState(touch_percent, parentNode);
   }
 
@@ -150,7 +146,7 @@ export class TDPControl extends Component<TDPControlProperties> {
   // Decorate the boost slider and set global vars
   setBoostSliderState(event_percent, parentNode) {
     //TODO get min/max of the srcElement
-    let boost_val = Math.ceil(event_percent * (7 - 0) + 0);
+    let boost_val = Math.ceil(event_percent * (4 - 0) + 0);
     let style = `--normalized-slider-value: ${event_percent}`;
 
     //set params
