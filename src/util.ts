@@ -1,7 +1,7 @@
 import {FunctionComponent} from 'preact';
 import {SMM} from './types/SMM';
 
-const VERSION = '0.1.0-rc5';
+const VERSION = '0.1.0';
 
 let battery_path = '';
 

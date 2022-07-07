@@ -74,4 +74,4 @@ help: ## Show this help message
 
 .PHONY: release
 release:
-	tar -czvf handy_pt-v0.1.0-rc5.tar.gz -T release
+	tar -czvf handy_pt-v0.1.0.tar.gz -T release
