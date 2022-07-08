@@ -1,7 +1,7 @@
 import {FunctionComponent} from 'preact';
 import {SMM} from './types/SMM';
 
-const VERSION = '0.1.0';
+const VERSION = '0.1.1';
 
 let battery_path = '';
 
@@ -40,7 +40,8 @@ export class PowerTools {
     switch (cpuid) {
     // 4500U/5800U max TDP 25w
     case 'AMD Ryzen 7 4500U with Radeon Graphics':
-    case 'AMD Ryzen 7 5800U with Radeon Graphics': {
+    case 'AMD Ryzen 7 5800U with Radeon Graphics': 
+    case 'AMD Ryzen 7 5700U with Radeon Graphics': {
       this.tdp_range.tdp_min_val = 5;
       this.tdp_range.tdp_max_val = 25;
       this.tdp_range.tdp_default_val = 16;
