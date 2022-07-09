@@ -10,6 +10,7 @@ This is a [Crankshaft](https://crankshaft.space/) plugin that provides control o
 
 ## What does it look like?
 
+Click this video:
 [![Handheld PowerTools - OneXPlayer mini AMD](https://img.youtube.com/vi/Q2JoKCXB8aM/0.jpg)](https://www.youtube.com/watch?v=Q2JoKCXB8aM)
 
 ## Which devices does this support?
