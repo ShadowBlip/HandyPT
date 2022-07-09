@@ -42,12 +42,12 @@ This should work on both ChimeraOS and HoloISO. There are two install methods, b
   2. HoloISO users will need to install glibc: `sudo pacman -Sy glibc`
   3. For manual installs you will need the wget package: `sudo pacman -Sy wget`
   
-  ### Crankshaft Plugin store (Coming soon, waiting on another PR, use Manual install for now)
+  ### Crankshaft Plugin store (Preferred)
   Open the home menu and navigate down to `Get Plugins`, then click `Install` on the `Handheld Power Tools` entry.
   Once installed, open a TTY via SSH or `ctrl+alt+f2` and run `sudo sh ~/.var/app/space.crankshaft.Crankshaft/data/crankshaft/plugins/HandyPT/configure.sh`
   reboot
   
-  ### Manual install (Advanced)
+  ### Manual install
   - open a TTY via SSH or `ctrl+alt+f2`
   - run the following commands:
   ```
