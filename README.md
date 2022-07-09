@@ -24,6 +24,49 @@ While any APU can theoretcally be utilized, the safe operating limits need to be
 
 We test each release on ChimeraOS and HoloISO. Any distro that supports flatpak, gamescope, and wayland should be able to use this with the DeckUI. Head over to the [issues page](https://github.com/ShadowBlip/HandyPT/issues) if your distro has issues and we'll work to get more broad support.
 
+## Installing
+
+This should work on both ChimeraOS and HoloISO. There are two install methods, both require a little bit of command line.
+  
+  ### Prerequisites: 
+  
+  1. Install crankshaft: https://crankshaft.space/
+    - enable -cef-enable-debugging in the steam developer settings.
+  ```
+  flatpak install -y flathub space.crankshaft.Crankshaft
+  flatpak run space.crankshaft.Crankshaft
+  ```
+  
+  2. HoloISO users will need to install glibc: `sudo pacman -Sy glibc`
+  3. For manual installs you will need the wget package: `sudo pacman -Sy wget`
+  
+  ### Crankshaft Plugin store (Coming soon, waiting on another PR, use Manual install for now)
+  Open the home menu and navigate down to `Get Plugins`, then click `Install` on the `Handheld Power Tools` entry.
+  Once installed, open a TTY via SSH or `ctrl+alt+f2` and run `sudo sh ~/.var/app/space.crankshaft.Crankshaft/data/crankshaft/plugins/HandyPT/configure.sh`
+  reboot
+  
+  ### Manual install (Advanced)
+  - open a TTY via SSH or `ctrl+alt+f2`
+  - run the following commands:
+  ```
+  cd ~/.var/app/space.crankshaft.Crankshaft/data/crankshaft/plugins/
+  wget https://github.com/ShadowBlip/HandyPT/files/9075194/handy_pt-v0.1.1.tar.gz
+  tar -xzf handy_pt-v0.1.1.tar.gz
+  sudo HandyPT/configure.sh
+  ```
+  Edit `~/.var/app/space.crankshaft.Crankshaft/data/crankshaft/config.toml` and add the following:
+  ```
+  [plugins]
+    [plugins.HandyPT]
+      enabled = true
+  ```
+  *NOTE* If you have other plugins installed already, be sure to only have one [plugins] line. Each successive plugin follows the same pattern below that header.
+  
+  - reload crankshaft or reboot
+  
+  [handy_pt-v0.1.1.tar.gz](https://github.com/ShadowBlip/HandyPT/files/9075194/handy_pt-v0.1.1.tar.gz)
+  sha256: `f1a3fdc171539a44700d42d68c1703b198edaf3b2d3667e7402a7a5ac717e70e`
+
 ## License
 
 This is licensed under GNU GPLv3.
