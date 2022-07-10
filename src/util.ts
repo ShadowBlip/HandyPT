@@ -1,18 +1,21 @@
-import {FunctionComponent} from 'preact';
-import {SMM} from './types/SMM';
+import { FunctionComponent } from 'preact';
+import { stderr } from 'process';
+import { SMM } from './types/SMM';
 
-const VERSION = '0.1.1';
+const VERSION = '0.2.0-dev';
 
 let battery_path = '';
 
 type GPUProps = {
-  a: string; b : string; c : string;
+  a: string;
+  b: string;
+  c: string;
 };
 
 const gpu_prop_dict: GPUProps = {
-  a : '0x0000', // STAPM LIMIT
-  b : '0x0008', // FAST PPT
-  c : '0x0010', // SLOW PPT
+  a: '0x0000', // STAPM LIMIT
+  b: '0x0008', // FAST PPT
+  c: '0x0010', // SLOW PPT
 };
 
 interface TDPRange {
@@ -33,34 +36,36 @@ export class PowerTools {
   tdp_delta: number = 0;
   tdp_range: TDPRange = {};
 
-  constructor(smm: SMM) { this.smm = smm; }
+  constructor(smm: SMM) {
+    this.smm = smm;
+  }
 
   async getTDPRange(): Promise<TDPRange> {
     const cpuid = await this.getCPUID();
     switch (cpuid) {
-    // 4500U/5800U max TDP 25w
-    case 'AMD Ryzen 7 4500U with Radeon Graphics':
-    case 'AMD Ryzen 7 5800U with Radeon Graphics': 
-    case 'AMD Ryzen 7 5700U with Radeon Graphics': {
-      this.tdp_range.tdp_min_val = 5;
-      this.tdp_range.tdp_max_val = 25;
-      this.tdp_range.tdp_default_val = 16;
-      break;
-    }
-    // 4800U max TDP 30w
-    case 'AMD Ryzen 7 4800U with Radeon Graphics': {
-      this.tdp_range.tdp_min_val = 5;
-      this.tdp_range.tdp_max_val = 30;
-      this.tdp_range.tdp_default_val = 18;
-      break;
-    }
-    // 5825U max TDP 32w
-    case 'AMD Ryzen 7 5825U with Radeon Graphics': {
-      this.tdp_range.tdp_min_val = 5;
-      this.tdp_range.tdp_max_val = 32;
-      this.tdp_range.tdp_default_val = 18;
-      break;
-    }
+      // 4500U/5800U max TDP 25w
+      case 'AMD Ryzen 7 4500U with Radeon Graphics':
+      case 'AMD Ryzen 7 5800U with Radeon Graphics':
+      case 'AMD Ryzen 7 5700U with Radeon Graphics': {
+        this.tdp_range.tdp_min_val = 5;
+        this.tdp_range.tdp_max_val = 25;
+        this.tdp_range.tdp_default_val = 16;
+        break;
+      }
+      // 4800U max TDP 30w
+      case 'AMD Ryzen 7 4800U with Radeon Graphics': {
+        this.tdp_range.tdp_min_val = 5;
+        this.tdp_range.tdp_max_val = 30;
+        this.tdp_range.tdp_default_val = 18;
+        break;
+      }
+      // 5825U max TDP 32w
+      case 'AMD Ryzen 7 5825U with Radeon Graphics': {
+        this.tdp_range.tdp_min_val = 5;
+        this.tdp_range.tdp_max_val = 32;
+        this.tdp_range.tdp_default_val = 18;
+        break;
+      }
     }
     return this.tdp_range;
   }
@@ -74,24 +79,28 @@ export class PowerTools {
   }
 
   async getHomeDir(): Promise<string> {
-    const out = await this.smm.Exec.run('bash', [ '-c', 'echo $HOME' ]);
+    const out = await this.smm.Exec.run('bash', ['-c', 'echo $HOME']);
     return out.stdout;
   }
 
   async getRyzenadj(): Promise<string> {
     const homeDir = await this.getHomeDir();
-    return `${
-        homeDir}/.var/app/space.crankshaft.Crankshaft/data/crankshaft/plugins/HandyPT/bin/ryzenadj`;
+    return `${homeDir}/.var/app/space.crankshaft.Crankshaft/data/crankshaft/plugins/HandyPT/bin/ryzenadj`;
   }
 
   // Returns the version strings
-  getVersion(): string { return VERSION; }
+  getVersion(): string {
+    return VERSION;
+  }
 
-  onViewReady() { console.log('Front-end initialised'); }
+  onViewReady() {
+    console.log('Front-end initialised');
+  }
 
   async readSysID(): Promise<string> {
     return await this.smm.FS.readFile(
-        '/sys/devices/virtual/dmi/id/product_name');
+      '/sys/devices/virtual/dmi/id/product_name'
+    );
   }
 
   // Set the given GPU property.
@@ -106,7 +115,7 @@ export class PowerTools {
     // Run command to parse current propery values
     const ryzenadj = await this.getRyzenadj();
     const args = `sudo ${ryzenadj} --dump-table`;
-    const cmd = await this.smm.Exec.run('bash', [ '-c', args ]);
+    const cmd = await this.smm.Exec.run('bash', ['-c', args]);
     const output = cmd.stdout;
 
     // Find the property we care about
@@ -136,9 +145,21 @@ export class PowerTools {
     value *= 1000;
     const ryzenadj = await this.getRyzenadj();
     const args = `sudo ${ryzenadj} -${prop} ${value.toString()}`;
-    const cmd = await this.smm.Exec.run('bash', [ '-c', args ]);
+    const cmd = await this.smm.Exec.run('bash', ['-c', args]);
     const output = cmd.stdout;
     console.log(output);
+  }
+
+  // Sets SMT on or off
+  async setSMT(value: String) {
+    console.log("we're in");
+    const homeDir = await this.getHomeDir();
+    const command = value === 'on' ? 'smtOn' : 'smtOff';
+    const args = `sudo ${homeDir}/.var/app/space.crankshaft.Crankshaft/data/crankshaft/plugins/HandyPT/bin/powertools.sh ${command}`;
+    const cmd = await this.smm.Exec.run('bash', ['-c', args]);
+    const output = cmd.stdout;
+    const err = cmd.stderr;
+    console.log(output, err);
   }
 }
 

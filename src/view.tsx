@@ -3,7 +3,6 @@ import { SMM } from './types/SMM';
 import { PowerTools } from './util';
 import { Battery } from './components/Battery';
 import { CPUControl } from './components/CPUControl.tsx'
-import { PersistToggle } from './components/PersistToggle.tsx';
 import { SystemLabel } from './components/SystemLabel';
 import { TDPControl } from './components/TDPControl';
 import { VersionLabel } from './components/VersionLabel';
@@ -33,9 +32,9 @@ export class App extends Component<AppProps> {
         <SystemLabel smm={props.smm} pt={props.pt} />
         <Battery smm={props.smm} pt={props.pt} />
         <TDPControl smm={props.smm} pt={props.pt} />
+        <CPUControl smm={props.smm} pt={props.pt} />
         <VersionLabel smm={props.smm} pt={props.pt} />
       </body>
     );
   }
 }
-//        <PersistToggle smm={props.smm} pt={props.pt} />

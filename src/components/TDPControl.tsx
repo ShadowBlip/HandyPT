@@ -2,8 +2,8 @@ import { Component, createRef, RefObject } from 'preact';
 import { SMM } from '../types/SMM';
 import { PowerTools } from '../util';
 export interface TDPControlProperties {
-  smm?: SMM;
-  pt?: PowerTools;
+  smm: SMM;
+  pt: PowerTools;
 }
 
 export class TDPControl extends Component<TDPControlProperties> {
@@ -23,14 +23,14 @@ export class TDPControl extends Component<TDPControlProperties> {
   async componentDidMount() {
     if (this.root.current) {
       // Get and set our range values
-      const tdp_range = await this.props.pt?.getTDPRange();
+      const tdp_range = await this.props.pt.getTDPRange();
 
       this.tdp_max_val = tdp_range!.tdp_max_val;
       this.tdp_min_val = tdp_range!.tdp_min_val;
       this.tdp_default_val = tdp_range!.tdp_default_val;
 
       // Get our current TDP and set to default or persisted value.
-      this.current_tdp = await this.props.pt?.readGPUProp('0x0000');
+      this.current_tdp = await this.props.pt.readGPUProp('0x0000');
       if (this.current_tdp != this.tdp_default_val) {
         this.setTDP(this.tdp_default_val);
       }
@@ -84,9 +84,9 @@ export class TDPControl extends Component<TDPControlProperties> {
     //set the correct TDP value
     let fast_ppt = tdp_val + this.current_boost;
     let slow_ppt = tdp_val + Math.ceil(this.current_boost / 2);
-    await this.props.pt?.setGPUProp(tdp_val, 'a');
-    await this.props.pt?.setGPUProp(fast_ppt, 'b');
-    await this.props.pt?.setGPUProp(slow_ppt, 'c');
+    await this.props.pt.setGPUProp(tdp_val, 'a');
+    await this.props.pt.setGPUProp(fast_ppt, 'b');
+    await this.props.pt.setGPUProp(slow_ppt, 'c');
   }
 
   // TDP SLIDER SECTION
