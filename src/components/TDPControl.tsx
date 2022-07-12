@@ -1,7 +1,7 @@
 import { Component, createRef, RefObject } from 'preact';
 import { SMM } from '../types/SMM';
 import { PowerTools } from '../util';
-import { Slider } from '../deck-components/Slider.tsx';
+import { ValueSlider } from '../deck-components/Slider.tsx';
 
 export interface TDPControlProperties {
   smm: SMM;
@@ -76,28 +76,32 @@ export class TDPControl extends Component<TDPControlProperties> {
   render(properties: TDPControlProperties) {
     return (
       <div
-        class="quickaccesscontrols_PanelSection_2C0g0"
+        class="quickaccesscontrols_PanelSectionRow_2VQ88"
         style="padding: 0px 4px"
       >
         <div class="gamepaddialog_Field_S-_La gamepaddialog_WithFirstRow_qFXi6 gamepaddialog_WithChildrenBelow_1u5FT gamepaddialog_VerticalAlignCenter_3XNvA gamepaddialog_InlineWrapShiftsChildrenBelow_pHUb6 gamepaddialog_ChildrenWidthFixed_1ugIU gamepaddialog_ExtraPaddingOnChildrenBelow_5UO-_ gamepaddialog_StandardPadding_XRBFu gamepaddialog_HighlightOnFocus_wE4V6 Panel Focusable ">
           <div class="quickaccesscontrols_PanelSectionTitle_2iFf9">
             <div class="quickaccesscontrols_Text_1hJkB">TDP Settings</div>
           </div>
-          <Slider
+          <ValueSlider
             ref={this.tdpSlider}
             onChange={(e: Event, value: number) => this.onChangeTDP(e, value)}
-            name="GPU TDP"
+            name="TDP"
             description={this.currentTDP}
             minVal={this.minTDP}
             maxVal={this.maxTDP}
+            data-cs-gp-in-group="tdp"
+            data-cs-gp-item="TDP_Slider"
           />
-          <Slider
+          <ValueSlider
             ref={this.boostSlider}
             onChange={(e: Event, value: number) => this.onChangeBoost(e, value)}
-            name="GPU TDP Boost"
+            name="TDP Boost Limit"
             description={this.currentBoost}
             minVal={this.minBoost}
             maxVal={this.maxBoost}
+            data-cs-gp-in-group="tdp"
+            data-cs-gp-item="Boost_Slider"
           />
         </div>
       </div>

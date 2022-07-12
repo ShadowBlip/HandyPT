@@ -17,7 +17,7 @@ export class VersionLabel extends Component<AppProps> {
   render(props: AppProps) {
     return (
       <div
-        class="quickaccesscontrols_PanelSection_2C0g0"
+        class="quickaccesscontrols_PanelSectionRow_2VQ88"
         style="padding: 0px 4px"
       >
         <div class="quickaccesscontrols_PanelSectionRow_2VQ88">

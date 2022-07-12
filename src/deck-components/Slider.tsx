@@ -16,7 +16,7 @@ export interface SliderProps {
   onClick?: (e: Event) => Promise<void>;
 }
 
-export class Slider extends Component<SliderProps> {
+export class ValueSlider extends Component<SliderProps> {
   root: RefObject = createRef();
   sliderControl: RefObject = createRef();
   sliderDescription: RefObject = createRef();
