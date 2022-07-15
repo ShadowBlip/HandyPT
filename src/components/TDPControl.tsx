@@ -90,8 +90,6 @@ export class TDPControl extends Component<TDPControlProperties> {
             description={this.currentTDP}
             minVal={this.minTDP}
             maxVal={this.maxTDP}
-            data-cs-gp-in-group="tdp"
-            data-cs-gp-item="TDP_Slider"
           />
           <ValueSlider
             ref={this.boostSlider}
@@ -100,8 +98,6 @@ export class TDPControl extends Component<TDPControlProperties> {
             description={this.currentBoost}
             minVal={this.minBoost}
             maxVal={this.maxBoost}
-            data-cs-gp-in-group="tdp"
-            data-cs-gp-item="Boost_Slider"
           />
         </div>
       </div>

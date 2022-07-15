@@ -28,25 +28,13 @@ export class App extends Component<AppProps> {
 
   render(props: AppProps, state: any) {
     return (
-      <div class="quickaccesscontrols_PanelSectionRow_2VQ88"
-          data-cs-gp-in-group="root"
-          data-cs-gp-group="control"
-          data-cs-gp-init-focus={true}
+      <div
+        class="quickaccesscontrols_PanelSectionRow_2VQ88"
       >
         <SystemLabel smm={props.smm} pt={props.pt} />
         <Battery smm={props.smm} pt={props.pt} />
-        <TDPControl
-          smm={props.smm}
-          pt={props.pt}
-          data-cs-gp-in-group="root"
-          data-cs-gp-group="tdp"
-        />
-        <CPUControl
-          smm={props.smm}
-          pt={props.pt}
-          data-cs-gp-in-group="root"
-          data-cs-gp-group="cpu"
-        />
+        <TDPControl smm={props.smm} pt={props.pt} />
+        <CPUControl smm={props.smm} pt={props.pt} />
         <VersionLabel smm={props.smm} pt={props.pt} />
       </div>
     );
