@@ -44,7 +44,7 @@ export class PowerTools {
     const cpuid = await this.getCPUID();
     switch (cpuid) {
       // 4500U/5800U max TDP 25w
-      case 'AMD Ryzen 7 4500U with Radeon Graphics':
+      case 'AMD Ryzen 5 4500U with Radeon Graphics':
       case 'AMD Ryzen 7 5800U with Radeon Graphics':
       case 'AMD Ryzen 7 5700U with Radeon Graphics': {
         this.tdp_range.tdp_min_val = 5;
