@@ -40,6 +40,27 @@ export class PowerTools {
     this.smm = smm;
   }
 
+  // gets the current power by device
+  async getPower(device: string): Promise<number> {
+    try {
+      const output = await this.smm.FS.readFile(
+        `/sys/class/power_supply/BAT0/${device}`
+      );
+      return parseInt(output.trim());
+    } catch (err) {
+      console.log(`Error fetching charge: ${err}`);
+      return 0;
+    }
+  }
+
+  // Gets the system id
+  async getSysID(): Promise<string> {
+    const id = await this.smm.FS.readFile(
+      '/sys/devices/virtual/dmi/id/product_name'
+    );
+    return id.trim();
+  }
+
   async getTDPRange(): Promise<TDPRange> {
     const cpuid = await this.getCPUID();
     switch (cpuid) {
@@ -150,9 +171,19 @@ export class PowerTools {
     console.log(output);
   }
 
+  // Sets CPU Boost on or off
+  async setBoost(value: String) {
+    const homeDir = await this.getHomeDir();
+    const command = value === 'on' ? 'cpuBoostOn' : 'cpuBoostOff';
+    const args = `sudo ${homeDir}/.var/app/space.crankshaft.Crankshaft/data/crankshaft/plugins/HandyPT/bin/powertools.sh ${command}`;
+    const cmd = await this.smm.Exec.run('bash', ['-c', args]);
+    const output = cmd.stdout;
+    const err = cmd.stderr;
+    console.log(output, err);
+  }
+
   // Sets SMT on or off
   async setSMT(value: String) {
-    console.log("we're in");
     const homeDir = await this.getHomeDir();
     const command = value === 'on' ? 'smtOn' : 'smtOff';
     const args = `sudo ${homeDir}/.var/app/space.crankshaft.Crankshaft/data/crankshaft/plugins/HandyPT/bin/powertools.sh ${command}`;
