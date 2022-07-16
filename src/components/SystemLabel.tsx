@@ -19,7 +19,6 @@ export class SystemLabel extends Component<SystemLabelProps> {
 
     if (this.sysID.current) {
       this.sysID.current.innerText = await this.props.pt.getSysID();
-      this.cpuID.current.innerText = await this.props.pt.getCPUID();
     }
 
     if (this.versionID.current) {
