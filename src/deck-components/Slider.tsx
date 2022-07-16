@@ -71,6 +71,7 @@ export class ValueSlider extends Component<SliderProps> {
     let touchLocation = e.touches[0].clientX - target_rect.left;
     await this.onHandleMove(e, touchLocation);
   }
+
   // Extract X of mouse location.
   async onHandleMouse(e: MouseEvent) {
     let touchLocation = e.layerX;
@@ -151,10 +152,6 @@ export class ValueSlider extends Component<SliderProps> {
                     ontouchstart={(e) => this.onTouchStart(e)}
                     ontouchmove={(e) => this.onTouchMove(e)}
                     ontouchend={(e) => this.onTouchEnd(e)}
-                    onMouseDown={(e) => this.onMouseDown(e)}
-                    onMouseMove={(e) => this.onMouseMove(e)}
-                    onMouseUp={(e) => this.onMouseUp(e)}
-                    onMouseOut={(e) => this.onMouseOut(e)}
                   >
                     <div
                       class="gamepadslider_SliderTrack_Mq25N"

@@ -40,6 +40,27 @@ export class PowerTools {
     this.smm = smm;
   }
 
+  // gets the current power by device
+  async getPower(device: string): Promise<number> {
+    try {
+      const output = await this.smm.FS.readFile(
+        `/sys/class/power_supply/BAT0/${device}`
+      );
+      return parseInt(output.trim());
+    } catch (err) {
+      console.log(`Error fetching charge: ${err}`);
+      return 0;
+    }
+  }
+
+  // Gets the system id
+  async getSysID(): Promise<string> {
+    const id = await this.smm.FS.readFile(
+      '/sys/devices/virtual/dmi/id/product_name'
+    );
+    return id.trim();
+  }
+
   async getTDPRange(): Promise<TDPRange> {
     const cpuid = await this.getCPUID();
     switch (cpuid) {

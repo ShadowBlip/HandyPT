@@ -32,31 +32,29 @@ export class CPUControl extends Component<CPUControlProps> {
         class="quickaccesscontrols_PanelSectionRow_2VQ88"
         style="padding: 0px 4px"
       >
-        <div class="quickaccesscontrols_PanelSectionTitle_2iFf9">
-          <div class="quickaccesscontrols_Text_1hJkB">CPU Settings</div>
+        <div class="gamepaddialog_Field_S-_La gamepaddialog_WithFirstRow_qFXi6 gamepaddialog_WithChildrenBelow_1u5FT gamepaddialog_VerticalAlignCenter_3XNvA gamepaddialog_InlineWrapShiftsChildrenBelow_pHUb6 gamepaddialog_ChildrenWidthFixed_1ugIU gamepaddialog_ExtraPaddingOnChildrenBelow_5UO-_ gamepaddialog_StandardPadding_XRBFu gamepaddialog_HighlightOnFocus_wE4V6 Panel Focusable ">
+          <div class="quickaccesscontrols_PanelSectionTitle_2iFf9">
+            <div class="quickaccesscontrols_Text_1hJkB">CPU Settings</div>
+          </div>
+          <Toggle
+            ref={this.smt}
+            enabled={true}
+            onClick={(e: Event, toggleState: boolean) =>
+              this.toggleSMT(e, toggleState)
+            }
+            name="Similtanious Multithreading"
+            description="Improves performance in some games. Recommended on for most titles."
+          />
+          <Toggle
+            ref={this.boost}
+            enabled={true}
+            onClick={(e: Event, toggleState: boolean) =>
+              this.toggleBoost(e, toggleState)
+            }
+            name="CPU Boosting"
+            description="Reduces maximum CPU Frequency and power draw. May improve performance in some GPU bound games."
+          />
         </div>
-        <Toggle
-          ref={this.smt}
-          enabled={true}
-          onClick={(e: Event, toggleState: boolean) =>
-            this.toggleSMT(e, toggleState)
-          }
-          name="Similtanious Multithreading"
-          description="Improves performance in some games. Recommended on for most titles."
-          data-cs-gp-in-group="cpu"
-          data-cs-gp-item="SMT_Toggle"
-        />
-        <Toggle
-          ref={this.boost}
-          enabled={true}
-          onClick={(e: Event, toggleState: boolean) =>
-            this.toggleBoost(e, toggleState)
-          }
-          name="CPU Boosting"
-          description="Reduces maximum CPU Frequency and power draw. May improve performance in some GPU bound games."
-          data-cs-gp-in-group="cpu"
-          data-cs-gp-item="Boost_Toggle"
-        />
       </div>
     );
   }
