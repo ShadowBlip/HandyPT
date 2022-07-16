@@ -39,5 +39,3 @@ export class App extends Component<AppProps> {
     );
   }
 }
-//      <body style="/*margin:0px;padding:0px;*/ overflow-x: hidden; margin: 0px">
-//      </body>
