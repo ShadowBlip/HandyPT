@@ -35,7 +35,6 @@ export class App extends Component<AppProps> {
         <CPUControl smm={props.smm} pt={props.pt} />
         <Battery smm={props.smm} pt={props.pt} />
         <SystemLabel smm={props.smm} pt={props.pt} />
-        <VersionLabel smm={props.smm} pt={props.pt} />
       </div>
     );
   }
