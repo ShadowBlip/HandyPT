@@ -32,7 +32,7 @@ export class TDPControl extends Component<TDPControlProperties> {
     this.maxBoost = 4;
 
     // Get our current TDP and set to default or persisted value.
-    this.currentTDP = await this.props.pt.readGPUProp('0x0000');
+    this.currentTDP = await this.props.pt.readGPUProp('a');
     if (this.currentTDP != this.defaultTDP) {
       this.currentTDP = this.defaultTDP;
       await this.setTDP();
@@ -66,9 +66,9 @@ export class TDPControl extends Component<TDPControlProperties> {
     let fast_ppt = this.currentTDP + this.currentBoost;
     let slow_ppt = this.currentTDP + Math.ceil(this.currentBoost / 2);
 
-    await this.props.pt.setGPUProp(this.currentTDP, 'a');
-    await this.props.pt.setGPUProp(fast_ppt, 'b');
-    await this.props.pt.setGPUProp(slow_ppt, 'c');
+    await this.props.pt.setGPUProp('a', this.currentTDP);
+    await this.props.pt.setGPUProp('b', fast_ppt);
+    await this.props.pt.setGPUProp('c', slow_ppt);
   }
 
   // VIEW SECTION

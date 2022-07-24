@@ -15,6 +15,18 @@ cpuBoostOff(){
   /usr/bin/echo 0 > /sys/devices/system/cpu/cpufreq/boost
 }
 
+intelSetTDPLong(){
+  /usr/bin/echo $2 > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_0_power_limit_uw
+}
+
+intelSetTDPShort(){
+  /usr/bin/echo $2 > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
+}
+
+intelSetTDPPeak(){
+  /usr/bin/echo $2 > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_2_power_limit_uw
+}
+
 if [[ $1 == "smtOn" ]]; then
   smtOn
 elif [[ $1 == "smtOff" ]]; then
@@ -23,6 +35,12 @@ elif [[ $1 == "cpuBoostOn" ]]; then
   cpuBoostOn
 elif [[ $1 == "cpuBoostOff" ]]; then
   cpuBoostOff
+elif [[ $1 == "setTDPLong"]]; then
+  intelSetTDPLong
+elif [[ $1 == "setTDPShort"]]; then
+  intelSetTDPShort
+elif [[ $1 == "setTDPPeak"]]; then
+  intelSetTDPPeak
 fi
 
 
