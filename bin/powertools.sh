@@ -35,11 +35,11 @@ elif [[ $1 == "cpuBoostOn" ]]; then
   cpuBoostOn
 elif [[ $1 == "cpuBoostOff" ]]; then
   cpuBoostOff
-elif [[ $1 == "setTDPLong"]]; then
+elif [[ $1 == "constraint_0_power_limit_uw"]]; then
   intelSetTDPLong
-elif [[ $1 == "setTDPShort"]]; then
+elif [[ $1 == "constraint_1_power_limit_uw"]]; then
   intelSetTDPShort
-elif [[ $1 == "setTDPPeak"]]; then
+elif [[ $1 == "constraint_2_power_limit_uw"]]; then
   intelSetTDPPeak
 fi
 
