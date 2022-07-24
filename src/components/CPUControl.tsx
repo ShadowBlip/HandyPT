@@ -1,6 +1,5 @@
 import { Component, createRef, RefObject } from 'preact';
 import { Toggle } from '../deck-components/Toggle.tsx';
-import { ValueSlider } from '../deck-components/Slider.tsx';
 import { SMM } from '../types/SMM';
 import { PowerTools } from '../util';
 

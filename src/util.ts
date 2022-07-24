@@ -1,5 +1,3 @@
-import { FunctionComponent } from 'preact';
-import { stderr } from 'process';
 import { SMM } from './types/SMM';
 
 const VERSION = '0.2.0-dev';
@@ -12,10 +10,16 @@ type GPUProps = {
   c: string;
 };
 
-const gpu_prop_dict: GPUProps = {
+const AMD_prop_dict: GPUProps = {
   a: '0x0000', // STAPM LIMIT
   b: '0x0008', // FAST PPT
   c: '0x0010', // SLOW PPT
+};
+
+const Intel_prop_dict: GPUProps = {
+  a: 'constraint_0_power_limit_uw', //long_term
+  b: 'constraint_1_power_limit_uw', //peak_power
+  c: 'constraint_2_power_limit_uw', //short_term
 };
 
 interface TDPRange {
@@ -66,29 +70,37 @@ export class PowerTools {
     switch (cpuid) {
       // 4500U/5800U max TDP 25w
       case 'AMD Ryzen 5 4500U with Radeon Graphics':
-      case 'AMD Ryzen 7 5800U with Radeon Graphics':
       case 'AMD Ryzen 7 5700U with Radeon Graphics': {
         this.tdp_range.tdp_min_val = 5;
         this.tdp_range.tdp_max_val = 25;
-        this.tdp_range.tdp_default_val = 16;
+        this.tdp_range.tdp_default_val = 15;
         break;
       }
       // 4800U max TDP 30w
+      case 'AMD Ryzen 7 5800U with Radeon Graphics':
       case 'AMD Ryzen 7 4800U with Radeon Graphics': {
         this.tdp_range.tdp_min_val = 5;
         this.tdp_range.tdp_max_val = 30;
-        this.tdp_range.tdp_default_val = 18;
+        this.tdp_range.tdp_default_val = 15;
         break;
       }
       // 5825U max TDP 32w
       case 'AMD Ryzen 7 5825U with Radeon Graphics': {
         this.tdp_range.tdp_min_val = 5;
         this.tdp_range.tdp_max_val = 32;
-        this.tdp_range.tdp_default_val = 18;
+        this.tdp_range.tdp_default_val = 15;
         break;
       }
     }
     return this.tdp_range;
+  }
+
+  async getCPUVendor(): Promise<string> {
+    const cpuid = await this.smm.Exec.run('bash', [
+      '-c',
+      'lscpu | grep "Vendor ID" | cut -d : -f 2 | xargs',
+    ]);
+    return cpuid.stdout;
   }
 
   async getCPUID(): Promise<string> {
@@ -124,16 +136,42 @@ export class PowerTools {
     );
   }
 
-  // Set the given GPU property.
-  async setGPUProp(value: number, prop: string): Promise<boolean> {
-    await this.writeGPUProp(prop, value);
-    this.modified_settings = true;
-    return true;
+  async setGPUProp(prop: string, value: number): Promise<boolean> {
+    let cpuVendor: string = await this.getCPUVendor();
+    switch (cpuVendor) {
+      case 'AuthenticAMD':
+      case 'AuthenticAMD Advanced Micro Devices, Inc.':
+        return await this.setAMDProp(prop, value);
+      case 'GenuineIntel':
+        return await this.setIntelProp(prop, value);
+    }
+    return false;
   }
 
-  // Read a specific GPU property.
   async readGPUProp(prop: string): Promise<number> {
+    let cpuVendor: string = await this.getCPUVendor();
+    switch (cpuVendor) {
+      case 'AuthenticAMD':
+      case 'AuthenticAMD Advanced Micro Devices, Inc.':
+        return await this.readAMDProp(prop);
+      case 'GenuineIntel':
+	let result = await this.readIntelProp(prop);
+      	return result/1000000;
+    }
+    return 0;
+  }
+
+  // Set the given AMD property.
+  async setAMDProp(prop: string, value: number): Promise<boolean> {
+    let result = await this.writeAMDProp(prop, value);
+    this.modified_settings = true;
+    return result;
+  }
+
+  // Read a specific AMD property.
+  async readAMDProp(prop: string): Promise<number> {
     // Run command to parse current propery values
+    const property = AMD_prop_dict[prop]
     const ryzenadj = await this.getRyzenadj();
     const args = `sudo ${ryzenadj} --dump-table`;
     const cmd = await this.smm.Exec.run('bash', ['-c', args]);
@@ -142,25 +180,23 @@ export class PowerTools {
     // Find the property we care about
     const all_props = output.split('\n');
     const prop_row = all_props.find((prop_row) => {
-      if (!prop_row.includes(prop)) {
+      if (!prop_row.includes(property)) {
         return false;
       }
       return true;
     });
     const row_list = prop_row?.split('|');
-    // console.log('row_list', row_list)
     const val = row_list![3].trim();
-    // console.log("val", val)
     return parseInt(val);
   }
 
   // Gets the value for the property requested
-  async writeGPUProp(prop: string, value: number) {
+  async writeAMDProp(prop: string, value: number): Promise<boolean> {
     // Prevent spaming parameter setting, can cause instability.
-    let current_val = await this.readGPUProp(gpu_prop_dict[prop]);
+    let current_val = await this.readAMDProp(prop);
     if (current_val === value) {
       // console.log('Value already set for property. Ignoring.');
-      return;
+      return true;
     }
 
     value *= 1000;
@@ -168,7 +204,45 @@ export class PowerTools {
     const args = `sudo ${ryzenadj} -${prop} ${value.toString()}`;
     const cmd = await this.smm.Exec.run('bash', ['-c', args]);
     const output = cmd.stdout;
-    console.log(output);
+    const err = cmd.stderr;
+    console.log(output, err);
+    if (err) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  async setIntelProp(prop: string, value: number): Promise<boolean> {
+    let result = await this.writeIntelProp(prop, value);
+    this.modified_settings = result;
+    return result;
+  }
+  async writeIntelProp(prop: string, value: number): Promise<boolean> {
+    // Prevent spaming parameter setting, can cause instability.
+    let current_val = await this.readIntelProp(prop);
+    if (current_val === value * 1000000) {
+      return false;
+    }
+    const homeDir = await this.getHomeDir();
+    const command = Intel_prop_dict[prop];
+    const args = `sudo ${homeDir}/.var/app/space.crankshaft.Crankshaft/data/crankshaft/plugins/HandyPT/bin/powertools.sh ${command} ${value}`;
+    const cmd = await this.smm.Exec.run('bash', ['-c', args]);
+    const output = cmd.stdout;
+    const err = cmd.stderr;
+    console.log(output, err);
+    if (err) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  async readIntelProp(prop: string): Promise<number> {
+    const command = Intel_prop_dict[prop];
+    const args = `cat /sys/class/powercap/intel-rapl/intel-rapl:0/${command}`;
+    const value = await this.smm.Exec.run('bash', ['-c', args]);
+    return parseInt(value.stdout);
   }
 
   // Sets CPU Boost on or off
