@@ -28,8 +28,8 @@ export class TDPControl extends Component<TDPControlProperties> {
     this.maxTDP = tdpRange!.tdp_max_val;
     this.minTDP = tdpRange!.tdp_min_val;
     this.defaultTDP = tdpRange!.tdp_default_val;
+    this.maxBoost = tdpRange!.tdp_max_boost;
     this.minBoost = 0;
-    this.maxBoost = 4;
 
     // Get our current TDP and set to default or persisted value.
     this.currentTDP = await this.props.pt.readGPUProp('a');
