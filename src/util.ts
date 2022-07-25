@@ -26,6 +26,7 @@ interface TDPRange {
   tdp_min_val?: number;
   tdp_max_val?: number;
   tdp_default_val?: number;
+  tdp_max_boost?: number;
 }
 
 export class PowerTools {
@@ -37,7 +38,6 @@ export class PowerTools {
   modified_settings: boolean = false;
   persistent: boolean = false;
   sys_id: string = '';
-  tdp_delta: number = 0;
   tdp_range: TDPRange = {};
 
   constructor(smm: SMM) {
@@ -68,27 +68,24 @@ export class PowerTools {
   async getTDPRange(): Promise<TDPRange> {
     const cpuid = await this.getCPUID();
     switch (cpuid) {
-      // 4500U/5800U max TDP 25w
       case 'AMD Ryzen 5 4500U with Radeon Graphics':
-      case 'AMD Ryzen 7 5700U with Radeon Graphics': {
-        this.tdp_range.tdp_min_val = 5;
-        this.tdp_range.tdp_max_val = 25;
+      case 'AMD Ryzen 7 5700U with Radeon Graphics':
+      case '11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz':
+      case '11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz':
+      case '11th Gen Intel(R) Core(TM) i7-1195G7 @ 2.90GHz': {
+        this.tdp_range.tdp_min_val = 4;
+        this.tdp_range.tdp_max_val = 28;
         this.tdp_range.tdp_default_val = 15;
+        this.tdp_range.tdp_max_boost = 2;
         break;
       }
-      // 4800U max TDP 30w
+      case 'AMD Ryzen 7 4800U with Radeon Graphics':
       case 'AMD Ryzen 7 5800U with Radeon Graphics':
-      case 'AMD Ryzen 7 4800U with Radeon Graphics': {
-        this.tdp_range.tdp_min_val = 5;
-        this.tdp_range.tdp_max_val = 30;
-        this.tdp_range.tdp_default_val = 15;
-        break;
-      }
-      // 5825U max TDP 32w
       case 'AMD Ryzen 7 5825U with Radeon Graphics': {
         this.tdp_range.tdp_min_val = 5;
-        this.tdp_range.tdp_max_val = 32;
+        this.tdp_range.tdp_max_val = 33;
         this.tdp_range.tdp_default_val = 15;
+        this.tdp_range.tdp_max_boost = 5;
         break;
       }
     }
@@ -155,8 +152,8 @@ export class PowerTools {
       case 'AuthenticAMD Advanced Micro Devices, Inc.':
         return await this.readAMDProp(prop);
       case 'GenuineIntel':
-	let result = await this.readIntelProp(prop);
-      	return result/1000000;
+        let result = await this.readIntelProp(prop);
+        return result / 1000000;
     }
     return 0;
   }
@@ -171,7 +168,7 @@ export class PowerTools {
   // Read a specific AMD property.
   async readAMDProp(prop: string): Promise<number> {
     // Run command to parse current propery values
-    const property = AMD_prop_dict[prop]
+    const property = AMD_prop_dict[prop];
     const ryzenadj = await this.getRyzenadj();
     const args = `sudo ${ryzenadj} --dump-table`;
     const cmd = await this.smm.Exec.run('bash', ['-c', args]);
