@@ -33,8 +33,6 @@ export class CPUControl extends Component<CPUControlProps> {
               enabled={true}
               onClick={(e, toggleState) => this.toggleSMT(e, toggleState)}
               name="Toggle SMT"
-              data-cs-gp-in-group="handy-cpu"
-              data-cs-gp-item="handy-cpu-tdp-toggle"
               description="Toggles Similtanious Multithreading"
             />
           </div>
