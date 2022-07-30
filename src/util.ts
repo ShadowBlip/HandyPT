@@ -117,6 +117,7 @@ export class PowerTools {
     const args = `sudo ${ryzenadj} --dump-table`;
     const cmd = await this.smm.Exec.run('bash', ['-c', args]);
     const output = cmd.stdout;
+    console.log(cmd);
 
     // Find the property we care about
     const all_props = output.split('\n');

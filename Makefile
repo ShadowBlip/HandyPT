@@ -51,9 +51,10 @@ tunnel: ## Create an SSH tunnel to remote Steam Client (accessible on localhost:
 	ssh $(SSH_USER)@$(SSH_HOST) -N -f -L 4040:localhost:8080
 
 # Mounts the remote device and creates an SSH tunnel for CEF access
-$(SSH_MOUNT_PATH):
+$(SSH_MOUNT_PATH)/.mounted:
 	mkdir -p $(SSH_MOUNT_PATH)
 	sshfs -o default_permissions $(SSH_USER)@$(SSH_HOST):$(SSH_CRANKSHAFT_DATA_PATH) $(SSH_MOUNT_PATH)
+	touch $(SSH_MOUNT_PATH)/.mounted
 	$(MAKE) tunnel
 
 # Cleans and transfers the project
@@ -67,7 +68,7 @@ remote-restart: ## Restart remote crankshaft
 	ssh $(SSH_USER)@$(SSH_HOST) systemctl --user restart crankshaft
 
 .PHONY: remote-update
-remote-update: dist $(SSH_MOUNT_PATH) $(SSH_MOUNT_PATH)/plugins/$(shell basename $(PWD)) remote-restart ## Remotely updates
+remote-update: dist $(SSH_MOUNT_PATH)/.mounted $(SSH_MOUNT_PATH)/plugins/$(shell basename $(PWD)) remote-restart ## Remotely updates
 
 .PHONY: help
 help: ## Show this help message
