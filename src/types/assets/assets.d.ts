@@ -1,2 +1,2 @@
-import puzzleIcon from '../assets/puzzle-icon.svg';
-export { puzzleIcon };
+import logoIcon from '../assets/logo.svg';
+export { logoIcon };

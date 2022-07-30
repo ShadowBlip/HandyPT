@@ -1,9 +1,10 @@
-import { Service } from '../Service';
+import { SMM } from '../../smm';
+import { Service } from '../service';
+import { confirm, createConfirmModal } from './confirm-modal';
 import { createProgressModal } from './progress-modal';
 export declare class UI extends Service {
-    createProgressModal(...args: Parameters<typeof createProgressModal>): {
-        open: (cancel: () => void) => void;
-        update: ({ progressPercent, progressBytes, finalSizeBytes, }: import("../Network").DownloadProgress) => void;
-        close: () => void;
-    };
+    confirm: typeof confirm;
+    createConfirmModal: typeof createConfirmModal;
+    createProgressModal: typeof createProgressModal;
+    constructor(smm: SMM);
 }

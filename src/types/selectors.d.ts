@@ -2,6 +2,7 @@ export declare const SHARED_SELECTORS: {
     appDetails: string;
     appDetailsHeader: string;
     appDetailsName: string;
+    appProperties: string;
 };
 export declare const DESKTOP_SELECTORS: {
     collections: string;
@@ -12,6 +13,8 @@ export declare const DECK_SELECTORS: {
     appDetailsHeaderImg: string;
     lockScreenContainer: string;
     quickAccessContainer: string;
+    topLevelTransitionSwitch: string;
+    appProperties: string;
 };
 declare const MODE_SELECTORS: {
     mainLibrary: {
