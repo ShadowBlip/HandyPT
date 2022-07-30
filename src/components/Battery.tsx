@@ -4,7 +4,6 @@ export interface LabelProperties {
   children?: ComponentChildren;
 }
 
-
 // Battery shit
 export class Battery extends Component<AppProps> {
   timer: number = 0;

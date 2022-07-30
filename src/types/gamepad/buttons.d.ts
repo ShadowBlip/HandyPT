@@ -1,0 +1,24 @@
+export declare const BTN_CODE: {
+    A: number;
+    B: number;
+    X: number;
+    Y: number;
+    LEFT_BUMPER: number;
+    RIGHT_BUMPER: number;
+    LEFT_TRIGGER: number;
+    RIGHT_TRIGGER: number;
+    UP: number;
+    DOWN: number;
+    LEFT: number;
+    RIGHT: number;
+    SELECT: number;
+    START: number;
+    LEFT_ANALOG_CLICK: number;
+    RIGHT_ANALOG_CLICK: number;
+    GRIP_LEFT_TOP: number;
+    GRIP_LEFT_BOTTOM: number;
+    GRIP_RIGHT_TOP: number;
+    GRIP_RIGHT_BOTTOM: number;
+    MENU: number;
+    QUICK_ACCESS: number;
+};

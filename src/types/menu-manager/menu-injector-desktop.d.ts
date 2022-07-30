@@ -1,4 +1,4 @@
-import { SMM } from '../SMM';
+import { SMM } from '../smm';
 import { MenuInjector, MenuItem } from './menu-manager';
 export declare class MenuInjectorDesktop implements MenuInjector {
     private readonly smm;

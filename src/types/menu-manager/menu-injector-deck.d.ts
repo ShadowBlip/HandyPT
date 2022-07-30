@@ -1,17 +1,16 @@
-import { MenuManager } from '.';
-import { SMM } from '../SMM';
-import { MenuInjector } from './menu-manager';
+import { SMM } from '../smm';
+import { MenuInjector, MenuItem, MenuManager } from './menu-manager';
 export declare class MenuInjectorDeck implements MenuInjector {
     private readonly smm;
     private readonly menuManager;
-    private page;
     private pageContainer;
+    private enteredWithNavigate;
+    private active?;
     constructor(smm: SMM, menuManager: MenuManager);
-    createMenuItem({ id, label, fontSize, }: {
-        id: string;
-        label: string;
-        fontSize?: number | undefined;
-    }): void;
+    openPage(id: string): Promise<void>;
+    closeActivePage(): Promise<void>;
+    createMenuItem({ id, label, fontSize }: MenuItem): void;
     removeMenuItem(id: string): void;
-    private createMenuPage;
+    showPageContainer(): void;
+    hidePageContainer(): void;
 }

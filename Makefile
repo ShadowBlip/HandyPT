@@ -8,7 +8,7 @@ CRANKSHAFT_DATA_PATH ?= .var/app/space.crankshaft.Crankshaft/data/crankshaft
 
 # SSH Configuration
 SSH_USER ?= gamer
-SSH_HOST ?= 192.168.0.176
+SSH_HOST ?= 192.168.0.31
 SSH_MOUNT_PATH ?= /tmp/remote
 SSH_CRANKSHAFT_DATA_PATH ?= /home/$(SSH_USER)/$(CRANKSHAFT_DATA_PATH)
 
@@ -59,7 +59,8 @@ $(SSH_MOUNT_PATH):
 # Cleans and transfers the project
 $(SSH_MOUNT_PATH)/plugins/$(shell basename $(PWD)): $(SRC_FILES)
 	rm -rf $(SSH_MOUNT_PATH)/plugins/$(shell basename $(PWD))
-	cp -r $(PWD) $(SSH_MOUNT_PATH)/plugins/
+	mkdir -p $(SSH_MOUNT_PATH)/plugins/HandyPT
+	cp -r bin dist plugin.toml $(SSH_MOUNT_PATH)/plugins/HandyPT
 
 .PHONY: remote-restart
 remote-restart: ## Restart remote crankshaft

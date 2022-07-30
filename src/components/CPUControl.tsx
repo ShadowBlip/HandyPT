@@ -11,7 +11,7 @@ export class CPUControl extends Component<CPUControlProps> {
   smt: RefObject = createRef();
 
   async toggleSMT(e: Event, toggleState: boolean) {
-    console.log(this.props)
+    console.log(this.props);
     const nextSetting = toggleState ? 'on' : 'off';
     console.log('nextSetting', nextSetting);
     await this.props.pt.setSMT(nextSetting);
@@ -33,6 +33,8 @@ export class CPUControl extends Component<CPUControlProps> {
               enabled={true}
               onClick={(e, toggleState) => this.toggleSMT(e, toggleState)}
               name="Toggle SMT"
+              data-cs-gp-in-group="handy-cpu"
+              data-cs-gp-item="handy-cpu-tdp-toggle"
               description="Toggles Similtanious Multithreading"
             />
           </div>

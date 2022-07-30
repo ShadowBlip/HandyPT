@@ -61,10 +61,13 @@ export class Toggle extends Component<ToggleProperties> {
           <div class="gamepaddialog_FieldLabel_3b0U-" ref={this.labelText}>
             {properties.name}
           </div>
+          {/* TODO: refactor gamepad properties to be generic */}
           <div
             class="gamepaddialog_Toggle_24G4g Focusable"
             ref={this.toggleButton}
             onClick={(e) => this.onClick(e)}
+            data-cs-gp-in-group="handy-cpu"
+            data-cs-gp-item="handy-cpu-tdp-toggle"
           >
             <div class="gamepaddialog_ToggleRail_2JtC3"></div>
             <div class="gamepaddialog_ToggleSwitch_3__OD"></div>

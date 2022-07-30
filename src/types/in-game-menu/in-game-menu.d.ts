@@ -1,4 +1,4 @@
-import { SMM } from '../SMM';
+import { SMM } from '../smm';
 declare type InGameMenuRender = (smm: SMM, root: HTMLElement) => void | Promise<void>;
 export interface InGameMenuItem {
     id: string;
