@@ -14,6 +14,8 @@ export interface SliderProps {
   name?: string;
   onChange: (e: Event, value: Number) => Promise<void>;
   onClick?: (e: Event) => Promise<void>;
+  gamepadGroup?: string;
+  gamepadItem?: string;
 }
 
 export class ValueSlider extends Component<SliderProps> {
@@ -33,18 +35,18 @@ export class ValueSlider extends Component<SliderProps> {
     this.props.onChange(e, this.props.currentVal);
   }
   async onMouseDown(e: MouseEvent) {
-  //  this.onHandleMouse(e);
+    //  this.onHandleMouse(e);
   }
   async onMouseMove(e: MouseEvent) {
-  //  this.onHandleMouse(e);
+    //  this.onHandleMouse(e);
   }
   async onMouseUp(e: MouseEvent) {
- //   this.onHandleMouse(e);
- // /  this.props.onChange(e, this.props.currentVal);
+    //   this.onHandleMouse(e);
+    // /  this.props.onChange(e, this.props.currentVal);
   }
   async onMouseOut(e: MouseEvent) {
-//    this.onHandleMouse(e);
- //   this.props.onChange(e, this.props.currentVal);
+    //    this.onHandleMouse(e);
+    //   this.props.onChange(e, this.props.currentVal);
   }
 
   // gets the relative touch percentage from a given touch event.
@@ -92,7 +94,7 @@ export class ValueSlider extends Component<SliderProps> {
 
   // Sets the current value from a touch/mouse event
   setCurrentVal(eventPercent: number) {
-    console.log(this.props.currentVal, eventPercent)
+    console.log(this.props.currentVal, eventPercent);
     this.props.currentVal = Math.ceil(
       eventPercent * (this.props.maxVal - this.props.minVal) + this.props.minVal
     );
@@ -152,6 +154,8 @@ export class ValueSlider extends Component<SliderProps> {
                     ontouchstart={(e) => this.onTouchStart(e)}
                     ontouchmove={(e) => this.onTouchMove(e)}
                     ontouchend={(e) => this.onTouchEnd(e)}
+                    data-cs-gp-in-group={props.gamepadGroup}
+                    data-cs-gp-group={`${props.gamepadGroup}-control`}
                   >
                     <div
                       class="gamepadslider_SliderTrack_Mq25N"
@@ -159,7 +163,11 @@ export class ValueSlider extends Component<SliderProps> {
                       ref={this.sliderTrack}
                     ></div>
                     <div class="gamepadslider_SliderHandleContainer_1pQZi">
-                      <div class="gamepadslider_SliderHandle_2yVKj"></div>
+                      <div
+                        class="gamepadslider_SliderHandle_2yVKj"
+                        data-cs-gp-in-group={`${props.gamepadGroup}-control`}
+                        data-cs-gp-item={`${props.gamepadGroup}-control-${props.gamepadItem}`}
+                      ></div>
                     </div>
                   </div>
                 </div>

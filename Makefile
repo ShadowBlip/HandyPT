@@ -62,9 +62,10 @@ cef-debug: ## Open Chrome CEF debugging. Add a network target: localhost:8080
 tunnel: ## Create an SSH tunnel to remote Steam Client (accessible on localhost:4040)
 	ssh $(SSH_USER)@$(SSH_HOST) -N -f -L 4040:localhost:8080
 
-$(SSH_MOUNT_PATH):
+$(SSH_MOUNT_PATH)/.mounted:
 	mkdir -p $(SSH_MOUNT_PATH)
 	sshfs -o default_permissions $(SSH_USER)@$(SSH_HOST):$(SSH_CRANKSHAFT_DATA_PATH) $(SSH_MOUNT_PATH)
+	touch $(SSH_MOUNT_PATH)/.mounted
 	$(MAKE) tunnel
 
 # Cleans and transfers the project
@@ -72,12 +73,16 @@ $(SSH_MOUNT_PATH)/plugins/$(PLUGIN_NAME): $(SRC_FILES)
 	rm -rf $(SSH_MOUNT_PATH)/plugins/$(PLUGIN_NAME)
 	cp -r $(PWD) $(SSH_MOUNT_PATH)/plugins/
 
+# Cleans and transfers the project
+#$(SSH_MOUNT_PATH)/plugins/$(PLUGIN_NAME): $(SRC_FILES)
+#	rsync -avh $(PWD)/ $(SSH_MOUNT_PATH)/plugins/$(PLUGIN_NAME) --delete
+
 .PHONY: remote-restart
 remote-restart: ## Restart remote crankshaft
 	ssh $(SSH_USER)@$(SSH_HOST) systemctl --user restart crankshaft
 
 .PHONY: remote-update
-remote-update: dist $(SSH_MOUNT_PATH) $(SSH_MOUNT_PATH)/plugins/$(PLUGIN_NAME) remote-restart
+remote-update: dist $(SSH_MOUNT_PATH)/.mounted $(SSH_MOUNT_PATH)/plugins/$(PLUGIN_NAME) remote-restart
 
 .PHONY: clean
 clean: ## Clean all build artifacts

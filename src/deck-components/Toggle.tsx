@@ -7,6 +7,8 @@ export interface ToggleProperties {
   description?: string;
   enabled?: boolean;
   name?: string;
+  gamepadGroup?: string;
+  gamepadItem?: string;
   onClick?: (e: Event, toggleState: boolean) => Promise<void>;
 }
 
@@ -70,6 +72,8 @@ export class Toggle extends Component<ToggleProperties> {
                 class="gamepaddialog_Toggle_24G4g Focusable"
                 ref={this.toggleButton}
                 onClick={(e) => this.onClick(e)}
+                data-cs-gp-in-group={properties.gamepadGroup}
+                data-cs-gp-item={properties.gamepadItem}
               >
                 <div class="gamepaddialog_ToggleRail_2JtC3"></div>
                 <div class="gamepaddialog_ToggleSwitch_3__OD"></div>

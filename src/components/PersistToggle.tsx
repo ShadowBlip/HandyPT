@@ -1,6 +1,8 @@
-import { Component, createRef } from 'preact';
+import { Component, ComponentChildren, createRef } from 'preact';
 import { AppProps } from '../view';
-import { Toggle } from '../deck-components/Toggle.tsx';
+import { Toggle } from '../deck-components/Toggle';
+import { SMM } from '../types/smm';
+import { PowerTools } from '../util';
 
 export interface PersistProps {
   smm: SMM;
@@ -14,8 +16,7 @@ export class PersistToggle extends Component<PersistProps> {
     super(props);
   }
 
-  async componentDidMount() {
-    }
+  async componentDidMount() {}
 
   async componentWillUnmount() {}
 
@@ -26,6 +27,8 @@ export class PersistToggle extends Component<PersistProps> {
         enabled={true}
         name="Persist Changes"
         description="Restores settings after a reboot"
+        gamepadGroup="handy-cpu"
+        gamepadItem="handy-cpu-persist-toggle"
       />
     );
   }

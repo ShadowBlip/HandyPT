@@ -1,7 +1,7 @@
 import { Component, createRef, RefObject } from 'preact';
 import { SMM } from '../types/SMM';
 import { PowerTools } from '../util';
-import { ValueSlider } from '../deck-components/Slider.tsx';
+import { ValueSlider } from '../deck-components/Slider';
 
 export interface TDPControlProperties {
   smm: SMM;
@@ -90,6 +90,8 @@ export class TDPControl extends Component<TDPControlProperties> {
             description={this.currentTDP}
             minVal={this.minTDP}
             maxVal={this.maxTDP}
+            gamepadGroup="handy"
+            gamepadItem="handy-tdp-slider"
           />
           <ValueSlider
             ref={this.boostSlider}
@@ -98,6 +100,8 @@ export class TDPControl extends Component<TDPControlProperties> {
             description={this.currentBoost}
             minVal={this.minBoost}
             maxVal={this.maxBoost}
+            gamepadGroup="handy"
+            gamepadItem="handy-boost-slider"
           />
         </div>
       </div>
