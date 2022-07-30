@@ -27,8 +27,8 @@ export class PersistToggle extends Component<PersistProps> {
         enabled={true}
         name="Persist Changes"
         description="Restores settings after a reboot"
-        gamepadGroup="handy-cpu"
-        gamepadItem="handy-cpu-persist-toggle"
+        gamepadGroup="handy"
+        gamepadItem="handy-persist-toggle"
       />
     );
   }

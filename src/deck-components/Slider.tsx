@@ -155,7 +155,7 @@ export class ValueSlider extends Component<SliderProps> {
                     ontouchmove={(e) => this.onTouchMove(e)}
                     ontouchend={(e) => this.onTouchEnd(e)}
                     data-cs-gp-in-group={props.gamepadGroup}
-                    data-cs-gp-group={`${props.gamepadGroup}-control`}
+                    data-cs-gp-group={`${props.gamepadGroup}-${props.gamepadItem}`}
                   >
                     <div
                       class="gamepadslider_SliderTrack_Mq25N"
@@ -165,8 +165,8 @@ export class ValueSlider extends Component<SliderProps> {
                     <div class="gamepadslider_SliderHandleContainer_1pQZi">
                       <div
                         class="gamepadslider_SliderHandle_2yVKj"
-                        data-cs-gp-in-group={`${props.gamepadGroup}-control`}
-                        data-cs-gp-item={`${props.gamepadGroup}-control-${props.gamepadItem}`}
+                        data-cs-gp-in-group={`${props.gamepadGroup}-${props.gamepadItem}`}
+                        data-cs-gp-item={`${props.gamepadGroup}-${props.gamepadItem}-handle`}
                       ></div>
                     </div>
                   </div>
