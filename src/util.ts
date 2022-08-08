@@ -72,6 +72,15 @@ export class PowerTools {
     const cpuid = await this.getCPUID();
     const id = await this.getSysID();
     switch (cpuid) {
+
+      case 'AMD Athlon Silver 3020e with Radeon Graphics': 
+      case 'AMD Athlon Silver 3050e with Radeon Graphics': {
+        this.tdp_range.tdp_min_val = 2;
+        this.tdp_range.tdp_max_val = 12;
+        this.tdp_range.tdp_default_val = 6;
+        this.tdp_range.tdp_max_boost = 2;
+        break;
+      }
       case 'AMD Ryzen 5 5560U with Radeon Graphics': {
         this.tdp_range.tdp_min_val = 2;
         this.tdp_range.tdp_max_val = 15;
@@ -80,10 +89,8 @@ export class PowerTools {
         }
         this.tdp_range.tdp_default_val = 6;
         this.tdp_range.tdp_max_boost = 2;
-
         break;
       }
-
       case 'AMD Ryzen 5 4500U with Radeon Graphics':
       case 'AMD Ryzen 7 5700U with Radeon Graphics':
       case 'AMD Ryzen 7 5800U with Radeon Graphics':
