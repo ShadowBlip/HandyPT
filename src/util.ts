@@ -17,9 +17,9 @@ const AMD_prop_dict: GPUProps = {
 };
 
 const Intel_prop_dict: GPUProps = {
-  a: 'constraint_0_power_limit_uw', //long_term
-  b: 'constraint_1_power_limit_uw', //peak_power
-  c: 'constraint_2_power_limit_uw', //short_term
+  a: 'constraint_0_power_limit_uw', // long_term
+  b: 'constraint_1_power_limit_uw', // peak_power
+  c: 'constraint_2_power_limit_uw', // short_term
 };
 
 interface TDPRange {
@@ -59,20 +59,28 @@ export class PowerTools {
 
   // Gets the system id
   async getSysID(): Promise<string> {
-    const id = await this.smm.FS.readFile(
-      '/sys/devices/virtual/dmi/id/product_name'
-    );
-    return id.trim();
+    if (this.sys_id == '') {
+      const id = await this.smm.FS.readFile(
+        '/sys/devices/virtual/dmi/id/product_name'
+      );
+      this.sys_id = id.trim();
+    }
+    return this.sys_id;
   }
 
   async getTDPRange(): Promise<TDPRange> {
     const cpuid = await this.getCPUID();
+    const id = await this.getSysID();
     switch (cpuid) {
       case 'AMD Ryzen 5 5560U with Radeon Graphics': {
         this.tdp_range.tdp_min_val = 2;
         this.tdp_range.tdp_max_val = 15;
+        if (id == 'AIR Pro') {
+          this.tdp_range.tdp_max_val = 18;
+        }
         this.tdp_range.tdp_default_val = 6;
         this.tdp_range.tdp_max_boost = 2;
+
         break;
       }
 
@@ -102,7 +110,6 @@ export class PowerTools {
         this.tdp_range.tdp_max_boost = 6;
         break;
       }
-    }
     }
     return this.tdp_range;
   }
