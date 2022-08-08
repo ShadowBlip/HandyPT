@@ -68,8 +68,17 @@ export class PowerTools {
   async getTDPRange(): Promise<TDPRange> {
     const cpuid = await this.getCPUID();
     switch (cpuid) {
+      case 'AMD Ryzen 5 5560U with Radeon Graphics': {
+        this.tdp_range.tdp_min_val = 2;
+        this.tdp_range.tdp_max_val = 15;
+        this.tdp_range.tdp_default_val = 6;
+        this.tdp_range.tdp_max_boost = 2;
+        break;
+      }
+
       case 'AMD Ryzen 5 4500U with Radeon Graphics':
       case 'AMD Ryzen 7 5700U with Radeon Graphics':
+      case 'AMD Ryzen 7 5800U with Radeon Graphics':
       case '11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz':
       case '11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz':
       case '11th Gen Intel(R) Core(TM) i7-1195G7 @ 2.90GHz': {
@@ -79,15 +88,21 @@ export class PowerTools {
         this.tdp_range.tdp_max_boost = 2;
         break;
       }
-      case 'AMD Ryzen 7 4800U with Radeon Graphics':
-      case 'AMD Ryzen 7 5800U with Radeon Graphics':
-      case 'AMD Ryzen 7 5825U with Radeon Graphics': {
+      case 'AMD Ryzen 7 4800U with Radeon Graphics': {
         this.tdp_range.tdp_min_val = 5;
-        this.tdp_range.tdp_max_val = 33;
+        this.tdp_range.tdp_max_val = 30;
         this.tdp_range.tdp_default_val = 15;
-        this.tdp_range.tdp_max_boost = 5;
+        this.tdp_range.tdp_max_boost = 4;
         break;
       }
+      case 'AMD Ryzen 7 5825U with Radeon Graphics': {
+        this.tdp_range.tdp_min_val = 5;
+        this.tdp_range.tdp_max_val = 32;
+        this.tdp_range.tdp_default_val = 15;
+        this.tdp_range.tdp_max_boost = 6;
+        break;
+      }
+    }
     }
     return this.tdp_range;
   }
