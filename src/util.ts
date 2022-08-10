@@ -1,6 +1,6 @@
 import { SMM } from './types/SMM';
 
-const VERSION = '0.2.0-dev';
+const VERSION = '0.2.0-rc1';
 
 let battery_path = '';
 
@@ -27,6 +27,7 @@ interface TDPRange {
   tdp_max_val?: number;
   tdp_default_val?: number;
   tdp_max_boost?: number;
+  set?: boolean;
 }
 
 export class PowerTools {
@@ -34,17 +35,21 @@ export class PowerTools {
   smm: SMM;
 
   // Backend properties
+  cpu_id: string = '';
+  cpu_vendor: string = '';
   gpu_model: string = '';
+  home_dir: string = '';
   modified_settings: boolean = false;
   persistent: boolean = false;
+  ryzenadj: string = '';
   sys_id: string = '';
-  tdp_range: TDPRange = {};
+  tdp_range: TDPRange = { set: false };
 
   constructor(smm: SMM) {
     this.smm = smm;
   }
 
-  // gets the current power by device
+  // Returns the specified battery power value (capacity/charge/power draw)
   async getPower(device: string): Promise<number> {
     try {
       const output = await this.smm.FS.readFile(
@@ -57,7 +62,62 @@ export class PowerTools {
     }
   }
 
-  // Gets the system id
+  // Returns TDP Range for a given CPU/APU/iGPU
+  async getTDPRange(): Promise<TDPRange> {
+    if (this.tdp_range.set === false) {
+      const cpuid = await this.getCPUID();
+      const id = await this.getSysID();
+      switch (cpuid) {
+        case 'AMD Athlon Silver 3020e with Radeon Graphics':
+        case 'AMD Athlon Silver 3050e with Radeon Graphics': {
+          this.tdp_range.tdp_min_val = 2;
+          this.tdp_range.tdp_max_val = 12;
+          this.tdp_range.tdp_default_val = 6;
+          this.tdp_range.tdp_max_boost = 8;
+          break;
+        }
+        case 'AMD Ryzen 5 5560U with Radeon Graphics': {
+          this.tdp_range.tdp_min_val = 2;
+          this.tdp_range.tdp_max_val = 15;
+          if (id == 'AIR Pro') {
+            this.tdp_range.tdp_max_val = 18;
+          }
+          this.tdp_range.tdp_default_val = 10;
+          this.tdp_range.tdp_max_boost = 5;
+          break;
+        }
+        case 'AMD Ryzen 5 4500U with Radeon Graphics':
+        case 'AMD Ryzen 7 5700U with Radeon Graphics':
+        case 'AMD Ryzen 7 5800U with Radeon Graphics':
+        case '11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz':
+        case '11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz':
+        case '11th Gen Intel(R) Core(TM) i7-1195G7 @ 2.90GHz': {
+          this.tdp_range.tdp_min_val = 4;
+          this.tdp_range.tdp_max_val = 28;
+          this.tdp_range.tdp_default_val = 14;
+          this.tdp_range.tdp_max_boost = 5;
+          break;
+        }
+        case 'AMD Ryzen 7 4800U with Radeon Graphics': {
+          this.tdp_range.tdp_min_val = 4;
+          this.tdp_range.tdp_max_val = 30;
+          this.tdp_range.tdp_default_val = 16;
+          this.tdp_range.tdp_max_boost = 5;
+          break;
+        }
+        case 'AMD Ryzen 7 5825U with Radeon Graphics': {
+          this.tdp_range.tdp_min_val = 4;
+          this.tdp_range.tdp_max_val = 32;
+          this.tdp_range.tdp_default_val = 16;
+          this.tdp_range.tdp_max_boost = 6;
+          break;
+        }
+      }
+    }
+    return this.tdp_range;
+  }
+
+  // Returns the DMI Product Name
   async getSysID(): Promise<string> {
     if (this.sys_id == '') {
       const id = await this.smm.FS.readFile(
@@ -68,83 +128,46 @@ export class PowerTools {
     return this.sys_id;
   }
 
-  async getTDPRange(): Promise<TDPRange> {
-    const cpuid = await this.getCPUID();
-    const id = await this.getSysID();
-    switch (cpuid) {
-
-      case 'AMD Athlon Silver 3020e with Radeon Graphics': 
-      case 'AMD Athlon Silver 3050e with Radeon Graphics': {
-        this.tdp_range.tdp_min_val = 2;
-        this.tdp_range.tdp_max_val = 12;
-        this.tdp_range.tdp_default_val = 6;
-        this.tdp_range.tdp_max_boost = 2;
-        break;
-      }
-      case 'AMD Ryzen 5 5560U with Radeon Graphics': {
-        this.tdp_range.tdp_min_val = 2;
-        this.tdp_range.tdp_max_val = 15;
-        if (id == 'AIR Pro') {
-          this.tdp_range.tdp_max_val = 18;
-        }
-        this.tdp_range.tdp_default_val = 6;
-        this.tdp_range.tdp_max_boost = 2;
-        break;
-      }
-      case 'AMD Ryzen 5 4500U with Radeon Graphics':
-      case 'AMD Ryzen 7 5700U with Radeon Graphics':
-      case 'AMD Ryzen 7 5800U with Radeon Graphics':
-      case '11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz':
-      case '11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz':
-      case '11th Gen Intel(R) Core(TM) i7-1195G7 @ 2.90GHz': {
-        this.tdp_range.tdp_min_val = 4;
-        this.tdp_range.tdp_max_val = 28;
-        this.tdp_range.tdp_default_val = 15;
-        this.tdp_range.tdp_max_boost = 2;
-        break;
-      }
-      case 'AMD Ryzen 7 4800U with Radeon Graphics': {
-        this.tdp_range.tdp_min_val = 5;
-        this.tdp_range.tdp_max_val = 30;
-        this.tdp_range.tdp_default_val = 15;
-        this.tdp_range.tdp_max_boost = 4;
-        break;
-      }
-      case 'AMD Ryzen 7 5825U with Radeon Graphics': {
-        this.tdp_range.tdp_min_val = 5;
-        this.tdp_range.tdp_max_val = 32;
-        this.tdp_range.tdp_default_val = 15;
-        this.tdp_range.tdp_max_boost = 6;
-        break;
-      }
-    }
-    return this.tdp_range;
-  }
-
+  // Returns the CPU Vendor
   async getCPUVendor(): Promise<string> {
-    const cpuid = await this.smm.Exec.run('bash', [
-      '-c',
-      'lscpu | grep "Vendor ID" | cut -d : -f 2 | xargs',
-    ]);
-    return cpuid.stdout;
+    if (this.cpu_vendor === '') {
+      const vendorid = await this.smm.Exec.run('bash', [
+        '-c',
+        'lscpu | grep "Vendor ID" | cut -d : -f 2 | xargs',
+      ]);
+      this.cpu_vendor = vendorid.stdout;
+    }
+    return this.cpu_vendor;
   }
 
+  // Returns the CPU Model
   async getCPUID(): Promise<string> {
-    const cpuid = await this.smm.Exec.run('bash', [
-      '-c',
-      'lscpu | grep "Model name" | cut -d : -f 2 | xargs',
-    ]);
-    return cpuid.stdout;
+    if (this.cpu_id === '') {
+      const cpuid = await this.smm.Exec.run('bash', [
+        '-c',
+        'lscpu | grep "Model name" | cut -d : -f 2 | xargs',
+      ]);
+      this.cpu_id = cpuid.stdout;
+    }
+    return this.cpu_id;
   }
 
+  // Returns the user $HOME directory
   async getHomeDir(): Promise<string> {
-    const out = await this.smm.Exec.run('bash', ['-c', 'echo $HOME']);
-    return out.stdout;
+    if (this.home_dir === '') {
+      const out = await this.smm.Exec.run('bash', ['-c', 'echo $HOME']);
+      this.home_dir = out.stdout;
+    }
+    return this.home_dir;
   }
 
+  // Returns the filepath for the RyzenAdj binary
   async getRyzenadj(): Promise<string> {
-    const homeDir = await this.getHomeDir();
-    return `${homeDir}/.var/app/space.crankshaft.Crankshaft/data/crankshaft/plugins/HandyPT/bin/ryzenadj`;
+    if (this.ryzenadj === '') {
+      const homeDir = await this.getHomeDir();
+      this.ryzenadj = `${homeDir}/.var/app/space.crankshaft.Crankshaft/data/crankshaft/plugins/HandyPT/bin/ryzenadj`;
+    }
+    return this.ryzenadj;
   }
 
   // Returns the version strings
@@ -156,12 +179,7 @@ export class PowerTools {
     console.log('Front-end initialised');
   }
 
-  async readSysID(): Promise<string> {
-    return await this.smm.FS.readFile(
-      '/sys/devices/virtual/dmi/id/product_name'
-    );
-  }
-
+  // Sets the given GPU property to the given value
   async setGPUProp(prop: string, value: number): Promise<boolean> {
     let cpuVendor: string = await this.getCPUVendor();
     switch (cpuVendor) {
@@ -174,6 +192,7 @@ export class PowerTools {
     return false;
   }
 
+  // Returns the current value if the given property
   async readGPUProp(prop: string): Promise<number> {
     let cpuVendor: string = await this.getCPUVendor();
     switch (cpuVendor) {
