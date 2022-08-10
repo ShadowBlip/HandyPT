@@ -8,7 +8,7 @@ TSX_FILES := $(shell find src -name *.tsx)
 SRC_FILES := $(TS_FILES) $(TSX_FILES) plugin.toml
 
 # Output files to include in tar.gz
-TAR_FILES := dist plugin.toml
+TAR_FILES := dist plugin.toml bin
 
 # Crankshaft
 CRANKSHAFT_DATA_PATH ?= .var/app/space.crankshaft.Crankshaft/data/crankshaft
