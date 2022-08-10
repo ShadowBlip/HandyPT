@@ -1,6 +1,6 @@
 # Configuration settings
 PLUGIN_NAME ?= $(shell basename $(PWD))
-PLUGIN_VERSION ?= 0.2.0-dev
+PLUGIN_VERSION ?= 0.2.0-rc1
 
 # Source files
 TS_FILES := $(shell find src -name *.ts)
