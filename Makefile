@@ -1,5 +1,6 @@
 # Configuration settings
 PLUGIN_NAME ?= $(shell basename $(PWD))
+PLUGIN_FILENAME ?= $(shell basename $(PWD) | tr '[:upper:]' '[:lower:]' )
 PLUGIN_VERSION ?= 0.2.0-rc1
 
 # Source files
@@ -24,11 +25,11 @@ SSH_CRANKSHAFT_DATA_PATH ?= /home/$(SSH_USER)/$(CRANKSHAFT_DATA_PATH)
 default: build restart
 
 .PHONY: build
-build: build/$(PLUGIN_NAME)-v$(PLUGIN_VERSION).tar.gz ## Builds the project
-build/$(PLUGIN_NAME)-v$(PLUGIN_VERSION).tar.gz: dist
+build: build/$(PLUGIN_FILENAME)-v$(PLUGIN_VERSION).tar.gz ## Builds the project
+build/$(PLUGIN_FILENAME)-v$(PLUGIN_VERSION).tar.gz: dist
 	mkdir -p build/$(PLUGIN_NAME)
 	cp -R $(TAR_FILES) build/$(PLUGIN_NAME)
-	cd build && tar -czvf $(PLUGIN_NAME)-v$(PLUGIN_VERSION).tar.gz $(PLUGIN_NAME)
+	cd build && tar -czvf $(PLUGIN_FILENAME)-v$(PLUGIN_VERSION).tar.gz $(PLUGIN_NAME)
 
 dist: $(SRC_FILES) node_modules
 	npm run build
@@ -66,21 +67,17 @@ $(SSH_MOUNT_PATH):
 	sshfs -o default_permissions $(SSH_USER)@$(SSH_HOST):$(SSH_CRANKSHAFT_DATA_PATH) $(SSH_MOUNT_PATH)
 	$(MAKE) tunnel
 
-$(SSH_MOUNT_PATH)/plugins/$(shell basename $(PWD)): $(SRC_FILES)
-	rm -rf $(SSH_MOUNT_PATH)/plugins/$(shell basename $(PWD))
+$(SSH_MOUNT_PATH)/plugins/$(PLUGIN_NAME): $(SRC_FILES)
+	rm -rf $(SSH_MOUNT_PATH)/plugins/$(PLUGIN_NAME)
 	cp -r $(PWD) $(SSH_MOUNT_PATH)/plugins/
-
-# Cleans and transfers the project
-#$(SSH_MOUNT_PATH)/plugins/$(PLUGIN_NAME): $(SRC_FILES)
-#	rsync -avh $(PWD)/ $(SSH_MOUNT_PATH)/plugins/$(PLUGIN_NAME) --delete
 
 .PHONY: remote-restart
 remote-restart: ## Restart remote crankshaft
 	ssh $(SSH_USER)@$(SSH_HOST) systemctl --user restart crankshaft
 
 .PHONY: remote-update
-#remote-update: dist $(SSH_MOUNT_PATH) $(SSH_MOUNT_PATH)/plugins/$(PLUGIN_NAME) remote-restart ## Remotely updates
-remote-update: dist $(SSH_MOUNT_PATH) $(SSH_MOUNT_PATH)/plugins/$(shell basename $(PWD)) remote-restart
+remote-update: dist $(SSH_MOUNT_PATH) $(SSH_MOUNT_PATH)/plugins/$(PLUGIN_NAME) remote-restart
+
 .PHONY: clean
 clean: ## Clean all build artifacts
 	rm -rf build dist

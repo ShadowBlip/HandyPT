@@ -72,7 +72,7 @@ export class PowerTools {
         case 'AMD Athlon Silver 3050e with Radeon Graphics': {
           this.tdp_range.tdp_min_val = 2;
           this.tdp_range.tdp_max_val = 12;
-          this.tdp_range.tdp_default_val = 6;
+          this.tdp_range.tdp_default_val = 8;
           this.tdp_range.tdp_max_boost = 8;
           break;
         }
@@ -82,7 +82,7 @@ export class PowerTools {
           if (id == 'AIR Pro') {
             this.tdp_range.tdp_max_val = 18;
           }
-          this.tdp_range.tdp_default_val = 10;
+          this.tdp_range.tdp_default_val = 8;
           this.tdp_range.tdp_max_boost = 5;
           break;
         }
@@ -105,7 +105,8 @@ export class PowerTools {
           this.tdp_range.tdp_max_boost = 5;
           break;
         }
-        case 'AMD Ryzen 7 5825U with Radeon Graphics': {
+        case 'AMD Ryzen 7 5825U with Radeon Graphics':
+        case 'AMD Ryzen 7 6800U with Radeon Graphics': {
           this.tdp_range.tdp_min_val = 4;
           this.tdp_range.tdp_max_val = 32;
           this.tdp_range.tdp_default_val = 16;
