@@ -1,6 +1,6 @@
 import { SMM } from './types/SMM';
 
-const VERSION = '0.2.0-rc2';
+const VERSION = '0.2.0';
 
 let battery_path = '';
 

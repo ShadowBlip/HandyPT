@@ -1,7 +1,7 @@
 # Configuration settings
 PLUGIN_NAME ?= $(shell basename $(PWD))
 PLUGIN_FILENAME ?= $(shell basename $(PWD) | tr '[:upper:]' '[:lower:]' )
-PLUGIN_VERSION ?= 0.2.0-rc2
+PLUGIN_VERSION ?= 0.2.0
 
 # Source files
 TS_FILES := $(shell find src -name *.ts)
@@ -67,6 +67,7 @@ $(SSH_MOUNT_PATH):
 	sshfs -o default_permissions $(SSH_USER)@$(SSH_HOST):$(SSH_CRANKSHAFT_DATA_PATH) $(SSH_MOUNT_PATH)
 	$(MAKE) tunnel
 
+# Cleans and transfers the project
 $(SSH_MOUNT_PATH)/plugins/$(PLUGIN_NAME): $(SRC_FILES)
 	rm -rf $(SSH_MOUNT_PATH)/plugins/$(PLUGIN_NAME)
 	cp -r $(PWD) $(SSH_MOUNT_PATH)/plugins/
