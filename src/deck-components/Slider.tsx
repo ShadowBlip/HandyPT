@@ -6,7 +6,64 @@ import {
   RefObject,
 } from 'preact';
 
+export interface NotchProps {
+  index: number;
+  gamepadGroup?: string;
+  gamepadItem?: string;
+  onChange?: (props: NotchProps, state: NotchState) => void;
+}
+
+export interface NotchState {
+  selected?: boolean;
+}
+
+export class Notch extends Component<NotchProps> {
+  ref = createRef<HTMLDivElement>();
+
+  async componentDidMount() {
+    if (!this.ref.current) {
+      return;
+    }
+
+    // Observe if someone mutates our class
+    const observer = new MutationObserver((mutations: MutationRecord[]) => {
+      // Set the notch item to selected if we see gamepad focus
+      if (this.ref.current!.classList.contains('cs-gp-focus')) {
+        this.setState({ selected: true });
+        if (this.props.onChange) {
+          this.props.onChange(this.props, { selected: true });
+        }
+        return;
+      }
+      this.setState({ selected: false });
+      if (this.props.onChange) {
+        this.props.onChange(this.props, { selected: false });
+      }
+    });
+    observer.observe(this.ref.current, {
+      attributes: true,
+      attributeFilter: ['class'],
+      childList: false,
+      characterData: false,
+    });
+  }
+
+  render(props: NotchProps) {
+    const gamepadItem = props.gamepadItem
+      ? props.gamepadItem
+      : `${props.gamepadGroup}-notch-${props.index}`;
+    return (
+      <div
+        ref={this.ref}
+        data-cs-gp-in-group={props.gamepadGroup}
+        data-cs-gp-item={gamepadItem}
+      ></div>
+    );
+  }
+}
+
 export interface SliderProps {
+  description?: string;
   children?: ComponentChildren;
   currentVal?: number;
   minVal?: number;
@@ -16,14 +73,19 @@ export interface SliderProps {
   onClick?: (e: Event) => Promise<void>;
   gamepadGroup?: string;
   gamepadItem?: string;
+  steps?: number;
 }
 
-export class ValueSlider extends Component<SliderProps> {
-  root: RefObject = createRef();
-  sliderControl: RefObject = createRef();
-  sliderDescription: RefObject = createRef();
-  sliderLabel: RefObject = createRef();
-  sliderTrack: RefObject = createRef();
+export interface SliderState {
+  currentStep?: number;
+}
+
+export class ValueSlider extends Component<SliderProps, SliderState> {
+  root: RefObject<HTMLDivElement> = createRef();
+  sliderControl: RefObject<HTMLDivElement> = createRef();
+  sliderDescription: RefObject<HTMLDivElement> = createRef();
+  sliderLabel: RefObject<HTMLDivElement> = createRef();
+  sliderTrack: RefObject<HTMLDivElement> = createRef();
 
   async onTouchStart(e: TouchEvent) {
     this.onHandleTouch(e);
@@ -34,17 +96,17 @@ export class ValueSlider extends Component<SliderProps> {
   async onTouchEnd(e: TouchEvent) {
     this.props.onChange(e, this.props.currentVal);
   }
-  async onMouseDown(e: MouseEvent) {
+  async onMouseDown() {
     //  this.onHandleMouse(e);
   }
-  async onMouseMove(e: MouseEvent) {
+  async onMouseMove() {
     //  this.onHandleMouse(e);
   }
-  async onMouseUp(e: MouseEvent) {
+  async onMouseUp() {
     //   this.onHandleMouse(e);
     // /  this.props.onChange(e, this.props.currentVal);
   }
-  async onMouseOut(e: MouseEvent) {
+  async onMouseOut() {
     //    this.onHandleMouse(e);
     //   this.props.onChange(e, this.props.currentVal);
   }
@@ -101,10 +163,11 @@ export class ValueSlider extends Component<SliderProps> {
   }
 
   // Decorate the TDP slider
-  setSliderState(eventPercent: number, parentNode) {
+  setSliderState(eventPercent: number, parentNode: HTMLDivElement | null) {
     let style = `--normalized-slider-value: ${eventPercent}`;
-    parentNode.setAttribute('style', style);
-    this.sliderDescription.current.innerText = this.props.currentVal.toString();
+    parentNode!.setAttribute('style', style);
+    const currentVal = this.props.currentVal ? this.props.currentVal : 0;
+    this.sliderDescription.current!.innerText = currentVal.toString();
   }
 
   // Force min/max/current values, used in parent to overwrite.
@@ -116,7 +179,21 @@ export class ValueSlider extends Component<SliderProps> {
     this.setSliderState(currentPercent, this.sliderControl.current);
   }
 
+  // Update the slider if our notch state changes
+  onStepChange(props: NotchProps, state: NotchState) {
+    if (!state.selected) {
+      return;
+    }
+    console.log(`Selecting notch ${props.index}`);
+    const steps = this.props.steps ? this.props.steps : 0;
+    const sliderPercent = props.index / (steps - 1);
+    this.setSliderState(sliderPercent, this.sliderControl.current);
+  }
+
   render(props: SliderProps) {
+    const numSteps = props.steps ? props.steps : 0;
+    const steps: number[] = [...Array(numSteps).keys()];
+
     return (
       <div class="quickaccesscontrols_PanelSectionRow_2VQ88" ref={this.root}>
         <div
@@ -140,20 +217,20 @@ export class ValueSlider extends Component<SliderProps> {
             <div class="gamepadslider_SliderControlWithIcon_2M8Pt Panel Focusable">
               <div
                 class="gamepadslider_SliderControlPanelGroup_MY8iY Panel Focusable"
-                tabindex="0"
+                tabIndex={0}
               >
                 <div
                   class="gamepadslider_SliderControlAndNotches_1Cccx Focusable"
-                  tabindex="0"
+                  tabIndex={0}
                   style="--normalized-slider-value:1;"
                 >
                   <div
                     class="gamepadslider_SliderControl_3o137"
                     id="sliderControl"
                     ref={this.sliderControl}
-                    ontouchstart={(e) => this.onTouchStart(e)}
-                    ontouchmove={(e) => this.onTouchMove(e)}
-                    ontouchend={(e) => this.onTouchEnd(e)}
+                    onTouchStart={(e) => this.onTouchStart(e)}
+                    onTouchMove={(e) => this.onTouchMove(e)}
+                    onTouchEnd={(e) => this.onTouchEnd(e)}
                     data-cs-gp-in-group={props.gamepadGroup}
                     data-cs-gp-group={`${props.gamepadGroup}-${props.gamepadItem}`}
                   >
@@ -163,11 +240,19 @@ export class ValueSlider extends Component<SliderProps> {
                       ref={this.sliderTrack}
                     ></div>
                     <div class="gamepadslider_SliderHandleContainer_1pQZi">
-                      <div
-                        class="gamepadslider_SliderHandle_2yVKj"
-                        data-cs-gp-in-group={`${props.gamepadGroup}-${props.gamepadItem}`}
-                        data-cs-gp-item={`${props.gamepadGroup}-${props.gamepadItem}-handle`}
-                      ></div>
+                      <div class="gamepadslider_SliderHandle_2yVKj"></div>
+
+                      <div class="gamepadslider_SliderNotchContainer_2N-a5 Panel Focusable">
+                        {steps.map((step: number) => (
+                          <Notch
+                            onChange={(props, state) =>
+                              this.onStepChange(props, state)
+                            }
+                            index={step}
+                            gamepadGroup={`${props.gamepadGroup}-${props.gamepadItem}`}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>

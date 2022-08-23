@@ -25,7 +25,7 @@ export class App extends Component<AppProps> {
     }
   }
 
-  render(props: AppProps, state: any) {
+  render(props: AppProps, _state: any) {
     return (
       <div
         class="quickaccesscontrols_PanelSectionRow_2VQ88"

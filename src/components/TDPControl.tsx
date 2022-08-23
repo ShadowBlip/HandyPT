@@ -51,12 +51,12 @@ export class TDPControl extends Component<TDPControlProperties> {
     );
   }
 
-  async onChangeTDP(e: Event, value: number) {
+  async onChangeTDP(_e: Event, value: number) {
     this.currentTDP = value;
     await this.setTDP();
   }
 
-  async onChangeBoost(e: Event, value: number) {
+  async onChangeBoost(_e: Event, value: number) {
     this.currentBoost = value;
     await this.setTDP();
   }
@@ -73,7 +73,7 @@ export class TDPControl extends Component<TDPControlProperties> {
 
   // VIEW SECTION
   // renders the GUI
-  render(properties: TDPControlProperties) {
+  render(_properties: TDPControlProperties) {
     return (
       <div
         class="quickaccesscontrols_PanelSectionRow_2VQ88"
@@ -90,6 +90,7 @@ export class TDPControl extends Component<TDPControlProperties> {
             description={this.currentTDP}
             minVal={this.minTDP}
             maxVal={this.maxTDP}
+            steps={5}
             gamepadGroup="handy"
             gamepadItem="handy-tdp-slider"
           />

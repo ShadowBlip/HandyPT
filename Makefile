@@ -71,7 +71,8 @@ $(SSH_MOUNT_PATH)/.mounted:
 # Cleans and transfers the project
 $(SSH_MOUNT_PATH)/plugins/$(PLUGIN_NAME): $(SRC_FILES)
 	rm -rf $(SSH_MOUNT_PATH)/plugins/$(PLUGIN_NAME)
-	cp -r $(PWD) $(SSH_MOUNT_PATH)/plugins/
+	mkdir -p $(SSH_MOUNT_PATH)/plugins/$(PLUGIN_NAME)
+	cp -r $(TAR_FILES) $(SSH_MOUNT_PATH)/plugins/$(PLUGIN_NAME)
 
 # Cleans and transfers the project
 #$(SSH_MOUNT_PATH)/plugins/$(PLUGIN_NAME): $(SRC_FILES)
