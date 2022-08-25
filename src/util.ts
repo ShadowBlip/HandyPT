@@ -10,6 +10,12 @@ type GPUProps = {
   c: string;
 };
 
+type GPUCurrent = {
+  a: number;
+  b: number;
+  c: number;
+};
+
 const AMD_prop_dict: GPUProps = {
   a: '0x0000', // STAPM LIMIT
   b: '0x0008', // FAST PPT
@@ -37,11 +43,16 @@ export class PowerTools {
   // Backend properties
   cpu_id: string = '';
   cpu_vendor: string = '';
+  current_tdp: GPUCurrent = {
+    a: 0,
+    b: 0,
+    c: 0,
+  };
   gpu_model: string = '';
-  home_dir: string = '';
   modified_settings: boolean = false;
   persistent: boolean = false;
-  ryzenadj: string = '';
+  powertools: string = window.csPluginsDir + '/HandyPT/bin/powertools.sh';
+  ryzenadj: string = window.csPluginsDir + '/HandyPT/bin/ryzenadj';
   sys_id: string = '';
   tdp_range: TDPRange = { set: false };
 
@@ -72,18 +83,19 @@ export class PowerTools {
         case 'AMD Athlon Silver 3050e with Radeon Graphics': {
           this.tdp_range.tdp_min_val = 2;
           this.tdp_range.tdp_max_val = 12;
-          this.tdp_range.tdp_default_val = 8;
-          this.tdp_range.tdp_max_boost = 8;
+          this.tdp_range.tdp_default_val = 9;
+          this.tdp_range.tdp_max_boost = 6;
           break;
         }
         case 'AMD Ryzen 5 5560U with Radeon Graphics': {
-          this.tdp_range.tdp_min_val = 2;
-          this.tdp_range.tdp_max_val = 15;
           if (id == 'AIR Pro') {
             this.tdp_range.tdp_max_val = 18;
-          }
-          this.tdp_range.tdp_default_val = 8;
-          this.tdp_range.tdp_max_boost = 5;
+          } else {
+            this.tdp_range.tdp_max_val = 15;
+	  }
+          this.tdp_range.tdp_default_val = 9;
+          this.tdp_range.tdp_max_boost = 2;
+          this.tdp_range.tdp_min_val = 2;
           break;
         }
         case 'AMD Ryzen 5 4500U with Radeon Graphics':
@@ -92,25 +104,32 @@ export class PowerTools {
         case '11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz':
         case '11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz':
         case '11th Gen Intel(R) Core(TM) i7-1195G7 @ 2.90GHz': {
-          this.tdp_range.tdp_min_val = 4;
-          this.tdp_range.tdp_max_val = 28;
           this.tdp_range.tdp_default_val = 14;
           this.tdp_range.tdp_max_boost = 5;
+          this.tdp_range.tdp_max_val = 28;
+          this.tdp_range.tdp_min_val = 4;
           break;
         }
         case 'AMD Ryzen 7 4800U with Radeon Graphics': {
-          this.tdp_range.tdp_min_val = 4;
-          this.tdp_range.tdp_max_val = 30;
           this.tdp_range.tdp_default_val = 16;
           this.tdp_range.tdp_max_boost = 5;
+          this.tdp_range.tdp_max_val = 30;
+          this.tdp_range.tdp_min_val = 4;
           break;
         }
         case 'AMD Ryzen 7 5825U with Radeon Graphics':
         case 'AMD Ryzen 7 6800U with Radeon Graphics': {
-          this.tdp_range.tdp_min_val = 4;
-          this.tdp_range.tdp_max_val = 32;
-          this.tdp_range.tdp_default_val = 16;
-          this.tdp_range.tdp_max_boost = 6;
+          if (id == 'AIR Pro') {
+            this.tdp_range.tdp_default_val = 9;
+            this.tdp_range.tdp_max_boost = 2;
+            this.tdp_range.tdp_max_val = 18;
+            this.tdp_range.tdp_min_val = 2;
+          } else {
+            this.tdp_range.tdp_default_val = 16;
+            this.tdp_range.tdp_max_boost = 6;
+            this.tdp_range.tdp_max_val = 32;
+            this.tdp_range.tdp_min_val = 4;
+	  }
           break;
         }
       }
@@ -153,31 +172,9 @@ export class PowerTools {
     return this.cpu_id;
   }
 
-  // Returns the user $HOME directory
-  async getHomeDir(): Promise<string> {
-    if (this.home_dir === '') {
-      const out = await this.smm.Exec.run('bash', ['-c', 'echo $HOME']);
-      this.home_dir = out.stdout;
-    }
-    return this.home_dir;
-  }
-
-  // Returns the filepath for the RyzenAdj binary
-  async getRyzenadj(): Promise<string> {
-    if (this.ryzenadj === '') {
-      const homeDir = await this.getHomeDir();
-      this.ryzenadj = `${homeDir}/.var/app/space.crankshaft.Crankshaft/data/crankshaft/plugins/HandyPT/bin/ryzenadj`;
-    }
-    return this.ryzenadj;
-  }
-
   // Returns the version strings
   getVersion(): string {
     return VERSION;
-  }
-
-  onViewReady() {
-    console.log('Front-end initialised');
   }
 
   // Sets the given GPU property to the given value
@@ -194,6 +191,10 @@ export class PowerTools {
   }
 
   // Returns the current value if the given property
+  // NOTE: currently bypassed while ryzenadj is updated.
+  // Will need to introduce again to verify continuously that nothing else
+  // overwrote us, or at least reflect and changes from BIOS or software we
+  // didn't do ourselves.
   async readGPUProp(prop: string): Promise<number> {
     let cpuVendor: string = await this.getCPUVendor();
     switch (cpuVendor) {
@@ -218,8 +219,7 @@ export class PowerTools {
   async readAMDProp(prop: string): Promise<number> {
     // Run command to parse current propery values
     const property = AMD_prop_dict[prop];
-    const ryzenadj = await this.getRyzenadj();
-    const args = `sudo ${ryzenadj} --dump-table`;
+    const args = `sudo ${this.ryzenadj} --dump-table`;
     const cmd = await this.smm.Exec.run('bash', ['-c', args]);
     const output = cmd.stdout;
 
@@ -239,15 +239,11 @@ export class PowerTools {
   // Gets the value for the property requested
   async writeAMDProp(prop: string, value: number): Promise<boolean> {
     // Prevent spaming parameter setting, can cause instability.
-    let current_val = await this.readAMDProp(prop);
-    if (current_val === value) {
-      // console.log('Value already set for property. Ignoring.');
+    if (this.current_tdp[prop] === value) {
       return true;
     }
 
-    value *= 1000;
-    const ryzenadj = await this.getRyzenadj();
-    const args = `sudo ${ryzenadj} -${prop} ${value.toString()}`;
+    const args = `sudo ${this.ryzenadj} -${prop} ${(value * 1000).toString()}`;
     const cmd = await this.smm.Exec.run('bash', ['-c', args]);
     const output = cmd.stdout;
     const err = cmd.stderr;
@@ -255,6 +251,7 @@ export class PowerTools {
     if (err) {
       return false;
     } else {
+      this.current_tdp[prop] = value
       return true;
     }
   }
@@ -264,15 +261,14 @@ export class PowerTools {
     this.modified_settings = result;
     return result;
   }
+
   async writeIntelProp(prop: string, value: number): Promise<boolean> {
     // Prevent spaming parameter setting, can cause instability.
-    let current_val = await this.readIntelProp(prop);
-    if (current_val === value * 1000000) {
+    if (this.current_tdp[prop] === value) {
       return false;
     }
-    const homeDir = await this.getHomeDir();
     const command = Intel_prop_dict[prop];
-    const args = `sudo ${homeDir}/.var/app/space.crankshaft.Crankshaft/data/crankshaft/plugins/HandyPT/bin/powertools.sh ${command} ${value}`;
+    const args = `sudo ${this.powertools} ${command} ${value}`;
     const cmd = await this.smm.Exec.run('bash', ['-c', args]);
     const output = cmd.stdout;
     const err = cmd.stderr;
@@ -280,6 +276,7 @@ export class PowerTools {
     if (err) {
       return false;
     } else {
+      this.current_tdp[prop] = value
       return true;
     }
   }
@@ -293,9 +290,8 @@ export class PowerTools {
 
   // Sets CPU Boost on or off
   async setBoost(value: String) {
-    const homeDir = await this.getHomeDir();
     const command = value === 'on' ? 'cpuBoostOn' : 'cpuBoostOff';
-    const args = `sudo ${homeDir}/.var/app/space.crankshaft.Crankshaft/data/crankshaft/plugins/HandyPT/bin/powertools.sh ${command}`;
+    const args = `sudo ${this.powertools} ${command}`;
     const cmd = await this.smm.Exec.run('bash', ['-c', args]);
     const output = cmd.stdout;
     const err = cmd.stderr;
@@ -304,25 +300,11 @@ export class PowerTools {
 
   // Sets SMT on or off
   async setSMT(value: String) {
-    const homeDir = await this.getHomeDir();
     const command = value === 'on' ? 'smtOn' : 'smtOff';
-    const args = `sudo ${homeDir}/.var/app/space.crankshaft.Crankshaft/data/crankshaft/plugins/HandyPT/bin/powertools.sh ${command}`;
+    const args = `sudo ${this.powertools} ${command}`;
     const cmd = await this.smm.Exec.run('bash', ['-c', args]);
     const output = cmd.stdout;
     const err = cmd.stderr;
     console.log(output, err);
   }
-}
-
-async function togglePersist() {
-  let toggle = document.getElementById('persistToggle');
-  let isActive = getToggleState(toggle);
-  await setPersistent(!isActive);
-  setToggleState(toggle, !isActive);
-}
-
-async function updateVersion() {
-  let version = await getVersion();
-  let target = document.getElementById('versionStr');
-  target.innerText = 'v' + version;
 }
