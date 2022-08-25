@@ -8,15 +8,22 @@ export interface TDPControlProperties {
   pt: PowerTools;
 }
 
-export class TDPControl extends Component<TDPControlProperties> {
-  currentBoost: number = 0;
-  currentTDP: number = 0;
-  defaultTDP: number = 0;
-  minTDP: number = 0;
-  maxTDP: number = 0;
-  minBoost: number = 0;
-  maxBoost: number = 0;
+export interface TDPControlState {
+  boostCurrent: number;
+  boostMax: number;
+  boostMin: number;
+  boostSteps: number;
+  tdpCurrent: number;
+  tdpDefault: number;
+  tdpMax: number;
+  tdpMin: number;
+  tdpSteps: number;
+}
 
+export class TDPControl extends Component<
+  TDPControlProperties,
+  TDPControlState
+> {
   // RefObjects
   tdpSlider: RefObject<HTMLDivElement> = createRef();
   boostSlider: RefObject<HTMLDivElement> = createRef();
@@ -25,55 +32,50 @@ export class TDPControl extends Component<TDPControlProperties> {
     // Get and set our range values
     const tdpRange = await this.props.pt.getTDPRange();
 
-    this.maxTDP = tdpRange!.tdp_max_val;
-    this.minTDP = tdpRange!.tdp_min_val;
-    this.defaultTDP = tdpRange!.tdp_default_val;
-    this.maxBoost = tdpRange!.tdp_max_boost;
-    this.minBoost = 0;
+    this.setState({
+      tdpMax: tdpRange!.tdp_max_val!,
+      tdpMin: tdpRange!.tdp_min_val!,
+      tdpDefault: tdpRange!.tdp_default_val!,
+      tdpSteps: tdpRange!.tdp_max_val! - tdpRange!.tdp_min_val! + 1,
+      tdpCurrent: tdpRange!.tdp_default_val!,
+      boostMax: tdpRange!.tdp_max_boost!,
+      boostMin: 0,
+      boostCurrent: 0,
+      boostSteps: tdpRange!.tdp_max_boost! + 1,
+    });
+  }
 
+  async componentDidUpdate() {
     // Get our current TDP and set to default or persisted value.
-    this.currentTDP = await this.props.pt.readGPUProp('a');
-    if (this.currentTDP != this.defaultTDP) {
-      this.currentTDP = this.defaultTDP;
-      await this.setTDP();
-    }
-
-    // Make sure our sliders match
-    this.tdpSlider!.current.setSliderParams(
-      this.minTDP,
-      this.maxTDP,
-      this.currentTDP
-    );
-    this.boostSlider!.current.setSliderParams(
-      this.minBoost,
-      this.maxBoost,
-      this.currentBoost
-    );
+    await this.setTDP();
   }
 
   async onChangeTDP(_e: Event, value: number) {
-    this.currentTDP = value;
-    await this.setTDP();
+    this.setState({ tdpCurrent: value });
   }
 
   async onChangeBoost(_e: Event, value: number) {
-    this.currentBoost = value;
-    await this.setTDP();
+    this.setState({ boostCurrent: value });
   }
   // Set the TDP to the given value
   async setTDP() {
-    // set the correct TDP value
-    let fast_ppt = this.currentTDP + this.currentBoost;
-    let slow_ppt = this.currentTDP + Math.ceil(this.currentBoost / 2);
+    if (!this.state.tdpCurrent) {
+      return;
+    }
 
-    await this.props.pt.setGPUProp('a', this.currentTDP);
+    // set the correct TDP value
+    let fast_ppt = this.state.tdpCurrent + this.state.boostCurrent;
+    let slow_ppt =
+      this.state.tdpCurrent + Math.ceil(this.state.boostCurrent / 2);
+
+    await this.props.pt.setGPUProp('a', this.state.tdpCurrent);
     await this.props.pt.setGPUProp('b', fast_ppt);
     await this.props.pt.setGPUProp('c', slow_ppt);
   }
 
   // VIEW SECTION
   // renders the GUI
-  render(_properties: TDPControlProperties) {
+  render(_properties: TDPControlProperties, state: TDPControlState) {
     return (
       <div
         class="quickaccesscontrols_PanelSectionRow_2VQ88"
@@ -87,10 +89,10 @@ export class TDPControl extends Component<TDPControlProperties> {
             ref={this.tdpSlider}
             onChange={(e: Event, value: number) => this.onChangeTDP(e, value)}
             name="TDP"
-            description={this.currentTDP}
-            minVal={this.minTDP}
-            maxVal={this.maxTDP}
-            steps={5}
+            minVal={state.tdpMin}
+            maxVal={state.tdpMax}
+            defaultVal={state.tdpDefault}
+            steps={state.tdpSteps}
             gamepadGroup="handy"
             gamepadItem="handy-tdp-slider"
           />
@@ -98,9 +100,9 @@ export class TDPControl extends Component<TDPControlProperties> {
             ref={this.boostSlider}
             onChange={(e: Event, value: number) => this.onChangeBoost(e, value)}
             name="TDP Boost Limit"
-            description={this.currentBoost}
-            minVal={this.minBoost}
-            maxVal={this.maxBoost}
+            minVal={state.boostMin}
+            maxVal={state.boostMax}
+            defaultVal={0}
             gamepadGroup="handy"
             gamepadItem="handy-boost-slider"
           />

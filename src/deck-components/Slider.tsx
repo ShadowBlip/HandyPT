@@ -63,13 +63,12 @@ export class Notch extends Component<NotchProps> {
 }
 
 export interface SliderProps {
-  description?: string;
   children?: ComponentChildren;
-  currentVal?: number;
+  defaultVal?: number;
   minVal?: number;
   maxVal?: number;
   name?: string;
-  onChange: (e: Event, value: Number) => Promise<void>;
+  onChange: (e: Event, value: number) => Promise<void>;
   onClick?: (e: Event) => Promise<void>;
   gamepadGroup?: string;
   gamepadItem?: string;
@@ -77,7 +76,9 @@ export interface SliderProps {
 }
 
 export interface SliderState {
+  currentVal?: number;
   currentStep?: number;
+  sliderPercent: number;
 }
 
 export class ValueSlider extends Component<SliderProps, SliderState> {
@@ -87,6 +88,16 @@ export class ValueSlider extends Component<SliderProps, SliderState> {
   sliderLabel: RefObject<HTMLDivElement> = createRef();
   sliderTrack: RefObject<HTMLDivElement> = createRef();
 
+  async componentDidUpdate(prevProps: SliderProps, prevState: SliderState) {
+    const hasCurrentVal = Object.keys(this.state).includes('currentVal');
+    if (!hasCurrentVal && this.props.defaultVal !== undefined) {
+      this.setState({
+        currentVal: this.props.defaultVal,
+        sliderPercent: this.getPercentFromValue(this.props.defaultVal),
+      });
+    }
+  }
+
   async onTouchStart(e: TouchEvent) {
     this.onHandleTouch(e);
   }
@@ -94,7 +105,7 @@ export class ValueSlider extends Component<SliderProps, SliderState> {
     this.onHandleTouch(e);
   }
   async onTouchEnd(e: TouchEvent) {
-    this.props.onChange(e, this.props.currentVal);
+    this.props.onChange(e, this.state.currentVal!);
   }
   async onMouseDown() {
     //  this.onHandleMouse(e);
@@ -131,7 +142,7 @@ export class ValueSlider extends Component<SliderProps, SliderState> {
 
   // Extract X of touch location.
   async onHandleTouch(e: TouchEvent) {
-    let target_rect = e.target.getBoundingClientRect();
+    let target_rect = e.target!.getBoundingClientRect();
     let touchLocation = e.touches[0].clientX - target_rect.left;
     await this.onHandleMove(e, touchLocation);
   }
@@ -150,33 +161,26 @@ export class ValueSlider extends Component<SliderProps, SliderState> {
       touchLocation,
       parentNode.clientWidth
     );
-    this.setCurrentVal(touchPercent);
-    this.setSliderState(touchPercent, parentNode);
+    this.setState({
+      currentVal: this.getValueFromPercent(touchPercent),
+      sliderPercent: touchPercent,
+    });
   }
 
-  // Sets the current value from a touch/mouse event
-  setCurrentVal(eventPercent: number) {
-    console.log(this.props.currentVal, eventPercent);
-    this.props.currentVal = Math.ceil(
-      eventPercent * (this.props.maxVal - this.props.minVal) + this.props.minVal
+  // Calculate the value between minimum and maximum based on the given
+  // percentage.
+  getValueFromPercent(eventPercent: number): number {
+    return Math.ceil(
+      eventPercent * (this.props.maxVal! - this.props.minVal!) +
+        this.props.minVal!
     );
   }
 
-  // Decorate the TDP slider
-  setSliderState(eventPercent: number, parentNode: HTMLDivElement | null) {
-    let style = `--normalized-slider-value: ${eventPercent}`;
-    parentNode!.setAttribute('style', style);
-    const currentVal = this.props.currentVal ? this.props.currentVal : 0;
-    this.sliderDescription.current!.innerText = currentVal.toString();
-  }
-
-  // Force min/max/current values, used in parent to overwrite.
-  setSliderParams(minVal: number, maxVal: number, currentVal: number) {
-    this.props.minVal = minVal;
-    this.props.maxVal = maxVal;
-    this.props.currentVal = currentVal;
-    let currentPercent = (currentVal - minVal) / (maxVal - minVal);
-    this.setSliderState(currentPercent, this.sliderControl.current);
+  // Calculate the percentage the given value is between the minimum and maximum
+  getPercentFromValue(value: number): number {
+    return (
+      (value - this.props.minVal!) / (this.props.maxVal! - this.props.minVal!)
+    );
   }
 
   // Update the slider if our notch state changes
@@ -187,12 +191,13 @@ export class ValueSlider extends Component<SliderProps, SliderState> {
     console.log(`Selecting notch ${props.index}`);
     const steps = this.props.steps ? this.props.steps : 0;
     const sliderPercent = props.index / (steps - 1);
-    this.setSliderState(sliderPercent, this.sliderControl.current);
+    this.setState({ sliderPercent: sliderPercent });
   }
 
-  render(props: SliderProps) {
+  render(props: SliderProps, state: SliderState) {
     const numSteps = props.steps ? props.steps : 0;
     const steps: number[] = [...Array(numSteps).keys()];
+    const style = `--normalized-slider-value: ${state.sliderPercent}`;
 
     return (
       <div class="quickaccesscontrols_PanelSectionRow_2VQ88" ref={this.root}>
@@ -209,7 +214,7 @@ export class ValueSlider extends Component<SliderProps, SliderState> {
                 class="gamepadslider_DescriptionValue_2oRwF"
                 ref={this.sliderDescription}
               >
-                {props.description}
+                {`${state.currentVal}`}
               </div>
             </div>
           </div>
@@ -228,9 +233,10 @@ export class ValueSlider extends Component<SliderProps, SliderState> {
                     class="gamepadslider_SliderControl_3o137"
                     id="sliderControl"
                     ref={this.sliderControl}
-                    onTouchStart={(e) => this.onTouchStart(e)}
-                    onTouchMove={(e) => this.onTouchMove(e)}
-                    onTouchEnd={(e) => this.onTouchEnd(e)}
+                    style={style}
+                    ontouchstart={(e) => this.onTouchStart(e)}
+                    ontouchmove={(e) => this.onTouchMove(e)}
+                    ontouchend={(e) => this.onTouchEnd(e)}
                     data-cs-gp-in-group={props.gamepadGroup}
                     data-cs-gp-group={`${props.gamepadGroup}-${props.gamepadItem}`}
                   >
