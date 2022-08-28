@@ -8,6 +8,7 @@ import {
 
 export interface NotchProps {
   index: number;
+  gamepadFocused?: string;
   gamepadGroup?: string;
   gamepadItem?: string;
   onChange?: (props: NotchProps, state: NotchState) => void;
@@ -57,7 +58,9 @@ export class Notch extends Component<NotchProps> {
         ref={this.ref}
         data-cs-gp-in-group={props.gamepadGroup}
         data-cs-gp-item={gamepadItem}
-      ></div>
+	data-cs-gp-init-focus={props.gamepadFocused}
+	style="outline: white solid 0px;"
+      />
     );
   }
 }
@@ -92,6 +95,7 @@ export class ValueSlider extends Component<SliderProps, SliderState> {
     const hasCurrentVal = Object.keys(this.state).includes('currentVal');
     if (!hasCurrentVal && this.props.defaultVal !== undefined) {
       this.setState({
+        currentStep: (this.props.defaultVal - this.props.minVal),
         currentVal: this.props.defaultVal,
         sliderPercent: this.getPercentFromValue(this.props.defaultVal),
       });
@@ -131,6 +135,11 @@ export class ValueSlider extends Component<SliderProps, SliderState> {
       eventPercent * (this.props.maxVal! - this.props.minVal!) +
         this.props.minVal!
     );
+  }
+
+  // Calculate the notch assigned to a given value
+  getNotchFromValue(value:number): number {
+    return (value - this.props.minVal!);
   }
 
   async onTouchStart(e: TouchEvent) {
@@ -173,13 +182,15 @@ export class ValueSlider extends Component<SliderProps, SliderState> {
 
   // Handle moving the slider by the given touch location.
   async onHandleMove(e: Event, touchLocation: number) {
-    let parentNode = this.getParentNode(e, 'sliderControl');
-    let touchPercent = this.getEventPercent(
+    const parentNode = this.getParentNode(e, 'sliderControl');
+    const touchPercent = this.getEventPercent(
       touchLocation,
       parentNode.clientWidth
     );
+    const currentVal = this.getValueFromPercent(touchPercent);
     this.setState({
-      currentVal: this.getValueFromPercent(touchPercent),
+      currentStep: this.getNotchFromValue(currentVal),
+      currentVal: currentVal,
       sliderPercent: touchPercent,
     });
   }
@@ -193,6 +204,7 @@ export class ValueSlider extends Component<SliderProps, SliderState> {
     const sliderPercent = props.index / (steps - 1);
     const currentVal = this.getValueFromPercent(sliderPercent)
     this.setState({
+      currentStep: props.index,
       currentVal: currentVal,
       sliderPercent: sliderPercent,
     });
@@ -262,6 +274,9 @@ export class ValueSlider extends Component<SliderProps, SliderState> {
                             }
                             index={step}
                             gamepadGroup={`${props.gamepadGroup}-${props.gamepadItem}`}
+			    gamepadFocused={
+			      step === state.currentStep ? "true" : "false"
+			    }
                           />
                         ))}
                       </div>
