@@ -68,7 +68,7 @@ export interface SliderProps {
   minVal?: number;
   maxVal?: number;
   name?: string;
-  onChange: (e: Event, value: number) => Promise<void>;
+  onChange?: (value: number) => Promise<void>;
   onClick?: (e: Event) => Promise<void>;
   gamepadGroup?: string;
   gamepadItem?: string;
@@ -98,36 +98,13 @@ export class ValueSlider extends Component<SliderProps, SliderState> {
     }
   }
 
-  async onTouchStart(e: TouchEvent) {
-    this.onHandleTouch(e);
-  }
-  async onTouchMove(e: TouchEvent) {
-    this.onHandleTouch(e);
-  }
-  async onTouchEnd(e: TouchEvent) {
-    this.props.onChange(e, this.state.currentVal!);
-  }
-  async onMouseDown() {
-    //  this.onHandleMouse(e);
-  }
-  async onMouseMove() {
-    //  this.onHandleMouse(e);
-  }
-  async onMouseUp() {
-    //   this.onHandleMouse(e);
-    // /  this.props.onChange(e, this.props.currentVal);
-  }
-  async onMouseOut() {
-    //    this.onHandleMouse(e);
-    //   this.props.onChange(e, this.props.currentVal);
-  }
-
   // gets the relative touch percentage from a given touch event.
   getEventPercent(eventLocation: number, objectWidth: number) {
     let touchRaw = eventLocation / objectWidth;
     let touchPercent = Math.min(Math.max(touchRaw, 0), 1);
     return touchPercent;
   }
+
   // returns the slider's actual parent node. If the slidertrack parent node
   // activated the event, returns that instead.
   getParentNode(e: Event, id: String) {
@@ -140,31 +117,11 @@ export class ValueSlider extends Component<SliderProps, SliderState> {
     return parentNode;
   }
 
-  // Extract X of touch location.
-  async onHandleTouch(e: TouchEvent) {
-    let target_rect = e.target!.getBoundingClientRect();
-    let touchLocation = e.touches[0].clientX - target_rect.left;
-    await this.onHandleMove(e, touchLocation);
-  }
-
-  // Extract X of mouse location.
-  async onHandleMouse(e: MouseEvent) {
-    let touchLocation = e.layerX;
-    await this.onHandleMove(e, touchLocation);
-  }
-
-  // Handle moving the slider by the given touch location.
-  async onHandleMove(e: Event, touchLocation: number) {
-    console.log(e);
-    let parentNode = this.getParentNode(e, 'sliderControl');
-    let touchPercent = this.getEventPercent(
-      touchLocation,
-      parentNode.clientWidth
+  // Calculate the percentage the given value is between the minimum and maximum
+  getPercentFromValue(value: number): number {
+    return (
+      (value - this.props.minVal!) / (this.props.maxVal! - this.props.minVal!)
     );
-    this.setState({
-      currentVal: this.getValueFromPercent(touchPercent),
-      sliderPercent: touchPercent,
-    });
   }
 
   // Calculate the value between minimum and maximum based on the given
@@ -176,11 +133,55 @@ export class ValueSlider extends Component<SliderProps, SliderState> {
     );
   }
 
-  // Calculate the percentage the given value is between the minimum and maximum
-  getPercentFromValue(value: number): number {
-    return (
-      (value - this.props.minVal!) / (this.props.maxVal! - this.props.minVal!)
+  async onTouchStart(e: TouchEvent) {
+    this.onHandleTouch(e);
+  }
+  async onTouchMove(e: TouchEvent) {
+    this.onHandleTouch(e);
+  }
+  async onTouchEnd(e: TouchEvent) {
+    this.props.onChange(this.state.currentVal!);
+  }
+
+  // Extract X of touch location.
+  async onHandleTouch(e: TouchEvent) {
+    let target_rect = e.target!.getBoundingClientRect();
+    let touchLocation = e.touches[0].clientX - target_rect.left;
+    await this.onHandleMove(e, touchLocation);
+  }
+
+  async onMouseDown() {
+    this.onHandleMouse(e);
+  }
+  async onMouseMove() {
+    this.onHandleMouse(e);
+  }
+  async onMouseUp() {
+    this.onHandleMouse(e);
+    this.props.onChange(this.props.currentVal);
+  }
+  async onMouseOut() {
+    this.onHandleMouse(e);
+    this.props.onChange(this.props.currentVal);
+  }
+
+  // Extract X of mouse location.
+  async onHandleMouse(e: MouseEvent) {
+    let touchLocation = e.layerX;
+    await this.onHandleMove(e, touchLocation);
+  }
+
+  // Handle moving the slider by the given touch location.
+  async onHandleMove(e: Event, touchLocation: number) {
+    let parentNode = this.getParentNode(e, 'sliderControl');
+    let touchPercent = this.getEventPercent(
+      touchLocation,
+      parentNode.clientWidth
     );
+    this.setState({
+      currentVal: this.getValueFromPercent(touchPercent),
+      sliderPercent: touchPercent,
+    });
   }
 
   // Update the slider if our notch state changes
@@ -188,10 +189,14 @@ export class ValueSlider extends Component<SliderProps, SliderState> {
     if (!state.selected) {
       return;
     }
-    console.log(`Selecting notch ${props.index}`);
     const steps = this.props.steps ? this.props.steps : 0;
     const sliderPercent = props.index / (steps - 1);
-    this.setState({ sliderPercent: sliderPercent });
+    const currentVal = this.getValueFromPercent(sliderPercent)
+    this.setState({
+      currentVal: currentVal,
+      sliderPercent: sliderPercent,
+    });
+    this.props.onChange(currentVal);
   }
 
   render(props: SliderProps, state: SliderState) {
@@ -234,6 +239,7 @@ export class ValueSlider extends Component<SliderProps, SliderState> {
                     id="sliderControl"
                     ref={this.sliderControl}
                     style={style}
+		    // Don't change these to the "correct" camel case names or they break. Preact bug.
                     ontouchstart={(e) => this.onTouchStart(e)}
                     ontouchmove={(e) => this.onTouchMove(e)}
                     ontouchend={(e) => this.onTouchEnd(e)}

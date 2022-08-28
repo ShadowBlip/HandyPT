@@ -50,11 +50,11 @@ export class TDPControl extends Component<
     await this.setTDP();
   }
 
-  async onChangeTDP(_e: Event, value: number) {
+  async onChangeTDP(value: number) {
     this.setState({ tdpCurrent: value });
   }
 
-  async onChangeBoost(_e: Event, value: number) {
+  async onChangeBoost(value: number) {
     this.setState({ boostCurrent: value });
   }
   // Set the TDP to the given value
@@ -87,7 +87,7 @@ export class TDPControl extends Component<
           </div>
           <ValueSlider
             ref={this.tdpSlider}
-            onChange={(e: Event, value: number) => this.onChangeTDP(e, value)}
+            onChange={(value: number) => this.onChangeTDP(value)}
             name="TDP"
             minVal={state.tdpMin}
             maxVal={state.tdpMax}
@@ -98,11 +98,12 @@ export class TDPControl extends Component<
           />
           <ValueSlider
             ref={this.boostSlider}
-            onChange={(e: Event, value: number) => this.onChangeBoost(e, value)}
+            onChange={(value: number) => this.onChangeBoost(value)}
             name="TDP Boost Limit"
             minVal={state.boostMin}
             maxVal={state.boostMax}
             defaultVal={0}
+	    steps={state.boostSteps}
             gamepadGroup="handy"
             gamepadItem="handy-boost-slider"
           />
