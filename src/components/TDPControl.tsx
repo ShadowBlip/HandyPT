@@ -1,7 +1,7 @@
 import { Component, createRef, RefObject } from 'preact';
 import { SMM } from '../types/SMM';
 import { PowerTools } from '../util';
-import { ValueSlider } from '../deck-components/Slider';
+import { SliderField } from '../deck-components/Slider';
 
 export interface TDPControlProperties {
   smm: SMM;
@@ -85,27 +85,31 @@ export class TDPControl extends Component<
           <div class="quickaccesscontrols_PanelSectionTitle_2iFf9">
             <div class="quickaccesscontrols_Text_1hJkB">TDP Settings</div>
           </div>
-          <ValueSlider
+          <SliderField
             ref={this.tdpSlider}
             onChange={(value: number) => this.onChangeTDP(value)}
-            name="TDP"
-            minVal={state.tdpMin}
-            maxVal={state.tdpMax}
-            defaultVal={state.tdpDefault}
-            steps={state.tdpSteps}
+            label="TDP"
+	    description="Sustained Power Consumption"
+            min={state.tdpMin}
+            max={state.tdpMax}
+	    value={state.tdpDefault}
+            step={1}
             gamepadGroup="handy"
             gamepadItem="handy-tdp-slider"
+	    showValue={true}
           />
-          <ValueSlider
+          <SliderField
             ref={this.boostSlider}
             onChange={(value: number) => this.onChangeBoost(value)}
-            name="TDP Boost Limit"
-            minVal={state.boostMin}
-            maxVal={state.boostMax}
-            defaultVal={0}
-	    steps={state.boostSteps}
+            label="TDP Boost Limit"
+	    description="Maximum Peak Power Usage"
+            min={state.boostMin}
+            max={state.boostMax}
+	    value={0}
+            step={1}
             gamepadGroup="handy"
             gamepadItem="handy-boost-slider"
+	    showValue={true}
           />
         </div>
       </div>

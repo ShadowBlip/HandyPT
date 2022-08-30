@@ -1,103 +1,97 @@
-import {
-  Component,
-  ComponentChildren,
-  createRef,
-  Ref,
-  RefObject,
-} from 'preact';
+import { Component, createRef } from "preact";
+import { BTN_CODE, GAMEPAD_FOCUSED, onGamepadFocus } from "./Gamepad";
 
-export interface NotchProps {
-  index: number;
-  gamepadFocused?: string;
+const FIELD_CLASSES =
+  "gamepaddialog_Field_S-_La gamepaddialog_WithFirstRow_qFXi6 gamepaddialog_WithChildrenBelow_1u5FT gamepaddialog_VerticalAlignCenter_3XNvA gamepaddialog_InlineWrapShiftsChildrenBelow_pHUb6 gamepaddialog_WithBottomSeparatorStandard_3s1Rk gamepaddialog_ChildrenWidthFixed_1ugIU gamepaddialog_ExtraPaddingOnChildrenBelow_5UO-_ gamepaddialog_StandardPadding_XRBFu gamepaddialog_HighlightOnFocus_wE4V6 Panel Focusable";
+
+export interface SliderProps {
+  label?: string; // Slider name, shows top left.
+  description?: string; // Functional details, shows below, small text
+  value?: number;
+  step?: number;
+  max?: number;
+  min?: number;
+  showValue?: boolean; // if true shows value top right
+  onChange: (value: number) => void;
   gamepadGroup?: string;
   gamepadItem?: string;
-  onChange?: (props: NotchProps, state: NotchState) => void;
 }
 
-export interface NotchState {
-  selected?: boolean;
+export interface SliderState {
+  propValue?: number;
+  currentVal?: number;
+  focused?: boolean;
 }
 
-export class Notch extends Component<NotchProps> {
+export class SliderField extends Component<SliderProps, SliderState> {
   ref = createRef<HTMLDivElement>();
+  async onTouchStart(e: TouchEvent) {
+    this.onHandleTouch(e);
+  }
+  async onTouchMove(e: TouchEvent) {
+    this.onHandleTouch(e);
+  }
+  async onTouchEnd(e: TouchEvent) {
+    this.props.onChange(this.state.currentVal!);
+  }
 
-  async componentDidMount() {
+  componentDidMount() {
     if (!this.ref.current) {
       return;
     }
 
-    // Observe if someone mutates our class
-    const observer = new MutationObserver((mutations: MutationRecord[]) => {
-      // Set the notch item to selected if we see gamepad focus
-      if (this.ref.current!.classList.contains('cs-gp-focus')) {
-        this.setState({ selected: true });
-        if (this.props.onChange) {
-          this.props.onChange(this.props, { selected: true });
+    const options = {
+      capture: true,
+      passive: true,
+      once: false,
+    };
+    this.ref.current.addEventListener(
+      "cs-gp-button-down",
+      (event: any) => {
+        // Ignore button presses we don't care about
+        if (
+          ![BTN_CODE.RIGHT, BTN_CODE.LEFT].includes(event.detail.buttonCode)
+        ) {
+          return;
         }
-        return;
-      }
-      this.setState({ selected: false });
-      if (this.props.onChange) {
-        this.props.onChange(this.props, { selected: false });
-      }
-    });
-    observer.observe(this.ref.current, {
-      attributes: true,
-      attributeFilter: ['class'],
-      childList: false,
-      characterData: false,
-    });
-  }
 
-  render(props: NotchProps) {
-    const gamepadItem = props.gamepadItem
-      ? props.gamepadItem
-      : `${props.gamepadGroup}-notch-${props.index}`;
-    return (
-      <div
-        ref={this.ref}
-        data-cs-gp-in-group={props.gamepadGroup}
-        data-cs-gp-item={gamepadItem}
-	data-cs-gp-init-focus={props.gamepadFocused}
-	style="outline: white solid 0px;"
-      />
+        const step = this.props.step ? this.props.step : 1;
+        const min = this.props.min ? this.props.min : 0;
+        const max = this.props.max ? this.props.max : 100;
+        const current =
+          this.state.currentVal !== undefined ? this.state.currentVal : max;
+
+        if (event.detail.buttonCode === BTN_CODE.RIGHT) {
+          const value = Math.min(max, current + step);
+          this.setState({ currentVal: value });
+          this.props.onChange(value);
+          return;
+        }
+        if (event.detail.buttonCode === BTN_CODE.LEFT) {
+          const value = Math.max(min, current - step);
+          this.setState({ currentVal: value });
+          this.props.onChange(value);
+          return;
+        }
+      },
+      options
     );
+
+    // Watch for gamepad focus events
+    onGamepadFocus(this.ref.current, (isFocused) => {
+      this.setState({ focused: isFocused });
+    });
   }
-}
 
-export interface SliderProps {
-  children?: ComponentChildren;
-  defaultVal?: number;
-  minVal?: number;
-  maxVal?: number;
-  name?: string;
-  onChange?: (value: number) => Promise<void>;
-  onClick?: (e: Event) => Promise<void>;
-  gamepadGroup?: string;
-  gamepadItem?: string;
-  steps?: number;
-}
-
-export interface SliderState {
-  currentVal?: number;
-  currentStep?: number;
-  sliderPercent: number;
-}
-
-export class ValueSlider extends Component<SliderProps, SliderState> {
-  root: RefObject<HTMLDivElement> = createRef();
-  sliderControl: RefObject<HTMLDivElement> = createRef();
-  sliderDescription: RefObject<HTMLDivElement> = createRef();
-  sliderLabel: RefObject<HTMLDivElement> = createRef();
-  sliderTrack: RefObject<HTMLDivElement> = createRef();
-
-  async componentDidUpdate(prevProps: SliderProps, prevState: SliderState) {
-    const hasCurrentVal = Object.keys(this.state).includes('currentVal');
-    if (!hasCurrentVal && this.props.defaultVal !== undefined) {
+  componentDidUpdate(prevProps: SliderProps, prevState: SliderState): void {
+    if (
+      this.props.value !== undefined &&
+      this.props.value !== this.state.propValue &&
+      this.state.currentVal !== this.props.value
+    ) {
       this.setState({
-        currentStep: (this.props.defaultVal - this.props.minVal),
-        currentVal: this.props.defaultVal,
-        sliderPercent: this.getPercentFromValue(this.props.defaultVal),
+        currentVal: this.props.value,
+        propValue: this.props.value,
       });
     }
   }
@@ -121,37 +115,6 @@ export class ValueSlider extends Component<SliderProps, SliderState> {
     return parentNode;
   }
 
-  // Calculate the percentage the given value is between the minimum and maximum
-  getPercentFromValue(value: number): number {
-    return (
-      (value - this.props.minVal!) / (this.props.maxVal! - this.props.minVal!)
-    );
-  }
-
-  // Calculate the value between minimum and maximum based on the given
-  // percentage.
-  getValueFromPercent(eventPercent: number): number {
-    return Math.ceil(
-      eventPercent * (this.props.maxVal! - this.props.minVal!) +
-        this.props.minVal!
-    );
-  }
-
-  // Calculate the notch assigned to a given value
-  getNotchFromValue(value:number): number {
-    return (value - this.props.minVal!);
-  }
-
-  async onTouchStart(e: TouchEvent) {
-    this.onHandleTouch(e);
-  }
-  async onTouchMove(e: TouchEvent) {
-    this.onHandleTouch(e);
-  }
-  async onTouchEnd(e: TouchEvent) {
-    this.props.onChange(this.state.currentVal!);
-  }
-
   // Extract X of touch location.
   async onHandleTouch(e: TouchEvent) {
     let target_rect = e.target!.getBoundingClientRect();
@@ -159,133 +122,72 @@ export class ValueSlider extends Component<SliderProps, SliderState> {
     await this.onHandleMove(e, touchLocation);
   }
 
-  async onMouseDown() {
-    this.onHandleMouse(e);
-  }
-  async onMouseMove() {
-    this.onHandleMouse(e);
-  }
-  async onMouseUp() {
-    this.onHandleMouse(e);
-    this.props.onChange(this.props.currentVal);
-  }
-  async onMouseOut() {
-    this.onHandleMouse(e);
-    this.props.onChange(this.props.currentVal);
-  }
-
-  // Extract X of mouse location.
-  async onHandleMouse(e: MouseEvent) {
-    let touchLocation = e.layerX;
-    await this.onHandleMove(e, touchLocation);
-  }
-
   // Handle moving the slider by the given touch location.
   async onHandleMove(e: Event, touchLocation: number) {
-    const parentNode = this.getParentNode(e, 'sliderControl');
-    const touchPercent = this.getEventPercent(
+    let parentNode = this.getParentNode(e, "sliderControl");
+    let touchPercent = this.getEventPercent(
       touchLocation,
       parentNode.clientWidth
     );
-    const currentVal = this.getValueFromPercent(touchPercent);
     this.setState({
-      currentStep: this.getNotchFromValue(currentVal),
-      currentVal: currentVal,
-      sliderPercent: touchPercent,
+      currentVal: this.getValueFromPercent(touchPercent),
     });
   }
 
-  // Update the slider if our notch state changes
-  onStepChange(props: NotchProps, state: NotchState) {
-    if (!state.selected) {
-      return;
-    }
-    const steps = this.props.steps ? this.props.steps : 0;
-    const sliderPercent = props.index / (steps - 1);
-    const currentVal = this.getValueFromPercent(sliderPercent)
-    this.setState({
-      currentStep: props.index,
-      currentVal: currentVal,
-      sliderPercent: sliderPercent,
-    });
-    this.props.onChange(currentVal);
+  // Calculate the value between minimum and maximum based on the given
+  // percentage.
+  getValueFromPercent(eventPercent: number): number {
+    return Math.ceil(
+      eventPercent * (this.props.max! - this.props.min!) + this.props.min!
+    );
+  }
+
+  // Calculate the percentage the given value is between the minimum and maximum
+  getPercentFromValue(value: number): number {
+    return (value - this.props.min!) / (this.props.max! - this.props.min!);
   }
 
   render(props: SliderProps, state: SliderState) {
-    const numSteps = props.steps ? props.steps : 0;
-    const steps: number[] = [...Array(numSteps).keys()];
-    const style = `--normalized-slider-value: ${state.sliderPercent}`;
+    const current = props.showValue ? state.currentVal : "";
+    // const sliderStyle = `outline: white solid 0px; --normalized-slider-value: ${this.getPercentFromValue(
+    const sliderStyle = `--normalized-slider-value: ${this.getPercentFromValue(
+      state.currentVal || props.min || 0
+    )}`;
+    const fieldClasses = state.focused
+      ? `${FIELD_CLASSES} ${GAMEPAD_FOCUSED}`
+      : FIELD_CLASSES;
 
     return (
-      <div class="quickaccesscontrols_PanelSectionRow_2VQ88" ref={this.root}>
-        <div
-          class="gamepaddialog_Field_S-_La gamepaddialog_WithFirstRow_qFXi6 gamepaddialog_WithChildrenBelow_1u5FT gamepaddialog_VerticalAlignCenter_3XNvA gamepaddialog_InlineWrapShiftsChildrenBelow_pHUb6 gamepaddialog_WithBottomSeparatorStandard_3s1Rk gamepaddialog_ChildrenWidthFixed_1ugIU gamepaddialog_ExtraPaddingOnChildrenBelow_5UO-_ gamepaddialog_StandardPadding_XRBFu gamepaddialog_HighlightOnFocus_wE4V6 Panel Focusable"
-          style="--indent-level:0;"
-        >
-          <div class="gamepaddialog_FieldLabelRow_H9WOq">
-            <div class="gamepaddialog_FieldLabel_3b0U-">
-              <div class="gamepadslider_LabelText_1-PvK" ref={this.sliderLabel}>
-                {props.name}
-              </div>
-              <div
-                class="gamepadslider_DescriptionValue_2oRwF"
-                ref={this.sliderDescription}
-              >
-                {`${state.currentVal}`}
-              </div>
+      <div class={fieldClasses} style="--indent-level:0;" ref={this.ref}>
+        <div class="gamepaddialog_FieldLabelRow_H9WOq">
+          <div class="gamepaddialog_FieldLabel_3b0U-">
+            <div class="gamepadslider_LabelText_1-PvK">{props.label}</div>
+            <div class="gamepadslider_DescriptionValue_2oRwF">
+              {`${current}`}
             </div>
           </div>
-          <div class="gamepaddialog_FieldChildren_14_HB">
-            <div class="gamepadslider_SliderControlWithIcon_2M8Pt Panel Focusable">
-              <div
-                class="gamepadslider_SliderControlPanelGroup_MY8iY Panel Focusable"
-                tabIndex={0}
-              >
-                <div
-                  class="gamepadslider_SliderControlAndNotches_1Cccx Focusable"
-                  tabIndex={0}
-                  style="--normalized-slider-value:1;"
-                >
-                  <div
-                    class="gamepadslider_SliderControl_3o137"
-                    id="sliderControl"
-                    ref={this.sliderControl}
-                    style={style}
-		    // Don't change these to the "correct" camel case names or they break. Preact bug.
-                    ontouchstart={(e) => this.onTouchStart(e)}
-                    ontouchmove={(e) => this.onTouchMove(e)}
-                    ontouchend={(e) => this.onTouchEnd(e)}
-                    data-cs-gp-in-group={props.gamepadGroup}
-                    data-cs-gp-group={`${props.gamepadGroup}-${props.gamepadItem}`}
-                  >
-                    <div
-                      class="gamepadslider_SliderTrack_Mq25N"
-                      id="sliderTrack"
-                      ref={this.sliderTrack}
-                    ></div>
-                    <div class="gamepadslider_SliderHandleContainer_1pQZi">
-                      <div class="gamepadslider_SliderHandle_2yVKj"></div>
-
-                      <div class="gamepadslider_SliderNotchContainer_2N-a5 Panel Focusable">
-                        {steps.map((step: number) => (
-                          <Notch
-                            onChange={(props, state) =>
-                              this.onStepChange(props, state)
-                            }
-                            index={step}
-                            gamepadGroup={`${props.gamepadGroup}-${props.gamepadItem}`}
-			    gamepadFocused={
-			      step === state.currentStep ? "true" : "false"
-			    }
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        </div>
+        <div class="gamepaddialog_FieldChildren_14_HB" style="min-width: 88px;">
+          <div
+            ref={this.ref}
+            class="gamepadslider_SliderControl_3o137"
+            style={sliderStyle}
+            data-cs-gp-in-group={props.gamepadGroup}
+            data-cs-gp-item={props.gamepadItem}
+            data-cs-gp-item-custom-events="true"
+            ontouchstart={(e) => this.onTouchStart(e)}
+            ontouchmove={(e) => this.onTouchMove(e)}
+            ontouchend={(e) => this.onTouchEnd(e)}
+          >
+            <div class="gamepadslider_SliderTrack_Mq25N gamepadslider_SliderHasNotches_2XiAy" />
+            <div class="gamepadslider_SliderHandleContainer_1pQZi">
+              <div class="gamepadslider_SliderHandle_2yVKj" />
+              <div class="gamepadslider_SliderNotchContainer_2N-a5 Panel Focusable"></div>
             </div>
           </div>
+        </div>
+        <div class="gamepaddialog_FieldDescription_2OJfk">
+          {props.description}
         </div>
       </div>
     );
