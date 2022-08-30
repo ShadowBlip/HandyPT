@@ -1,5 +1,5 @@
 import { Component, createRef, RefObject } from 'preact';
-import { Toggle } from '../deck-components/Toggle.tsx';
+import { Toggle } from '../deck-components/Toggle';
 import { SMM } from '../types/SMM';
 import { PowerTools } from '../util';
 
@@ -41,6 +41,8 @@ export class CPUControl extends Component<CPUControlProps> {
             onClick={(e: Event, toggleState: boolean) =>
               this.toggleSMT(e, toggleState)
             }
+            gamepadGroup="handy"
+            gamepadItem="handy-cpu-smt-toggle"
             name="Similtanious Multithreading"
             description="Improves performance in some games. Recommended on for most titles."
           />
@@ -50,6 +52,8 @@ export class CPUControl extends Component<CPUControlProps> {
             onClick={(e: Event, toggleState: boolean) =>
               this.toggleBoost(e, toggleState)
             }
+            gamepadGroup="handy"
+            gamepadItem="handy-cpu-boost-toggle"
             name="CPU Boosting"
             description="Reduces maximum CPU Frequency and power draw. May improve performance in some GPU bound games."
           />
