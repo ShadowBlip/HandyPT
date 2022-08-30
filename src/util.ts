@@ -100,12 +100,11 @@ export class PowerTools {
         }
         case 'AMD Ryzen 5 4500U with Radeon Graphics':
         case 'AMD Ryzen 7 5700U with Radeon Graphics':
-        case 'AMD Ryzen 7 5800U with Radeon Graphics':
         case '11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz':
         case '11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz':
         case '11th Gen Intel(R) Core(TM) i7-1195G7 @ 2.90GHz': {
           this.tdp_range.tdp_default_val = 14;
-          this.tdp_range.tdp_max_boost = 5;
+          this.tdp_range.tdp_max_boost = 2;
           this.tdp_range.tdp_max_val = 28;
           this.tdp_range.tdp_min_val = 4;
           break;
@@ -117,8 +116,9 @@ export class PowerTools {
           this.tdp_range.tdp_min_val = 4;
           break;
         }
+        case 'AMD Ryzen 7 5800U with Radeon Graphics':
         case 'AMD Ryzen 7 5825U with Radeon Graphics':
-        case 'AMD Ryzen 7 6800U with Radeon Graphics': {
+        case 'AMD Ryzen 5 6600U with Radeon Graphics': {
           if (id == 'AIR Pro') {
             this.tdp_range.tdp_default_val = 9;
             this.tdp_range.tdp_max_boost = 2;
@@ -126,12 +126,26 @@ export class PowerTools {
             this.tdp_range.tdp_min_val = 2;
           } else {
             this.tdp_range.tdp_default_val = 16;
-            this.tdp_range.tdp_max_boost = 6;
-            this.tdp_range.tdp_max_val = 32;
+            this.tdp_range.tdp_max_boost = 5;
+            this.tdp_range.tdp_max_val = 33;
             this.tdp_range.tdp_min_val = 4;
 	  }
           break;
         }
+        case 'AMD Ryzen 7 6800U with Radeon Graphics': {
+          this.tdp_range.tdp_default_val = 16;
+          this.tdp_range.tdp_max_boost = 4;
+          this.tdp_range.tdp_max_val = 38;
+          this.tdp_range.tdp_min_val = 4;
+          break;
+	}
+        case 'AMD Ryzen 9 6900HS with Radeon Graphics': {
+          this.tdp_range.tdp_default_val = 35;
+          this.tdp_range.tdp_max_boost = 4;
+          this.tdp_range.tdp_max_val = 50;
+          this.tdp_range.tdp_min_val = 4;
+          break;
+	}
       }
     }
     return this.tdp_range;

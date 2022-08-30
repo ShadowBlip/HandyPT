@@ -65,12 +65,10 @@ export class TDPControl extends Component<
 
     // set the correct TDP value
     let fast_ppt = this.state.tdpCurrent + this.state.boostCurrent;
-    let slow_ppt =
-      this.state.tdpCurrent + Math.ceil(this.state.boostCurrent / 2);
 
     await this.props.pt.setGPUProp('a', this.state.tdpCurrent);
     await this.props.pt.setGPUProp('b', fast_ppt);
-    await this.props.pt.setGPUProp('c', slow_ppt);
+    await this.props.pt.setGPUProp('c', this.state.tdpCurrent);
   }
 
   // VIEW SECTION
