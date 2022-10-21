@@ -94,7 +94,7 @@ export class PowerTools {
             this.tdp_range.tdp_max_val = 15;
 	  }
           this.tdp_range.tdp_default_val = 9;
-          this.tdp_range.tdp_max_boost = 2;
+          this.tdp_range.tdp_max_boost = 10;
           this.tdp_range.tdp_min_val = 2;
           break;
         }
@@ -121,7 +121,7 @@ export class PowerTools {
         case 'AMD Ryzen 5 6600U with Radeon Graphics': {
           if (id == 'AIR Pro') {
             this.tdp_range.tdp_default_val = 9;
-            this.tdp_range.tdp_max_boost = 2;
+            this.tdp_range.tdp_max_boost = 10;
             this.tdp_range.tdp_max_val = 18;
             this.tdp_range.tdp_min_val = 2;
           } else {
@@ -133,9 +133,9 @@ export class PowerTools {
           break;
         }
         case 'AMD Ryzen 7 6800U with Radeon Graphics': {
-          this.tdp_range.tdp_default_val = 16;
-          this.tdp_range.tdp_max_boost = 4;
-          this.tdp_range.tdp_max_val = 38;
+          this.tdp_range.tdp_default_val = 15;
+          this.tdp_range.tdp_max_boost = 9;
+          this.tdp_range.tdp_max_val = 36;
           this.tdp_range.tdp_min_val = 4;
           break;
 	}
