@@ -133,6 +133,12 @@ export class PowerTools {
           break;
         }
         case 'AMD Ryzen 7 6800U with Radeon Graphics': {
+          if (id == 'AOKZOE A1 AR07') {
+            this.tdp_range.tdp_default_val = 15;
+            this.tdp_range.tdp_max_boost = 8;
+            this.tdp_range.tdp_max_val = 28;
+            this.tdp_range.tdp_min_val = 4;
+          } else {
           this.tdp_range.tdp_default_val = 15;
           this.tdp_range.tdp_max_boost = 9;
           this.tdp_range.tdp_max_val = 36;
