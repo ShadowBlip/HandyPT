@@ -7,7 +7,7 @@ This is a [Crankshaft](https://crankshaft.space/) plugin that provides control o
 
 - Add RyzenAdj as a non-steam game. Using the launch parameters you can configure the TDP you want to set using the syntax describes in their README.md.
 - Add RyzenAdj as a launch parameter for each game with the game specific TDP you desire. 
-- For HoloISO users, some people have had success modifying the polkits to interecept the power1_cap setting the steam deck uses to reroute it to RyzenAdj.
+- For HoloISO users, some people have had success modifying the polkits to intercept the power1_cap setting the steam deck uses and reroute it to RyzenAdj.
 
 I will not be providing support for these methods. Currently I am working on getting these features added to decky-loader. As they won't accept HandyPT as a plugin I am working with the [PowerTools](https://github.com/NGnius/PowerTools) developer to bring htis feature set to that plugin, so watch for that development.
 
