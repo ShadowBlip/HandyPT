@@ -2,6 +2,15 @@
 
 This is a [Crankshaft](https://crankshaft.space/) plugin that provides control over various power settings such as TDP in handheld devices in Linux. We utilize the [RyzenAdj](https://github.com/FlyGoat/RyzenAdj) utility to interface with the hardware. 
 
+# Developers Note
+11/30/2022: Currently HandyPT is not able to be used. The underlying plug-in framkework, Crankshaft, no longer loads into the gamepadui. There is currently no ETA for a fix as the primary developer has not been active since late July. In the meantime, there are a few less ideal solutions to managing TDP on these devices.
+
+- Add RyzenAdj as a non-steam game. Using the launch parameters you can configure the TDP you want to set using the syntax describes in their README.md.
+- Add RyzenAdj as a launch parameter for each game with the game specific TDP you desire. 
+- For HoloISO users, some people have had success modifying the polkits to interecept the power1_cap setting the steam deck uses to reroute it to RyzenAdj.
+
+I will not be providing support for these methods. Currently I am working on getting these features added to decky-loader. As they won't accept HandyPT as a plugin I am working with the [PowerTools](https://github.com/NGnius/PowerTools) developer to bring htis feature set to that plugin, so watch for that development.
+
 ## What does it do?
 
 - Set GPU power parameters (TDP, Boost TDP)
