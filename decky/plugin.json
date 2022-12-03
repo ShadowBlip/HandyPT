@@ -1,0 +1,10 @@
+{
+  "name": "HandyPT",
+  "author": "Derek J. Clark",
+  "flags": ["debug", "_root"],
+  "publish": {
+    "tags": ["template", "root"],
+    "description": "Handheld Power Tools allows users to adjust the TDP and CPU settings on devices that aren't supported by vanilla GamepadUI in steam.",
+    "image": "https://opengraph.githubassets.com/1/SteamDeckHomebrew/PluginLoader"
+  }
+}

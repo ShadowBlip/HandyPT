@@ -1,0 +1,60 @@
+{
+  "name": "HandyPT",
+  "version": "0.4.0",
+  "description": "Handheld Power Tools allows users to adjust the TDP and CPU settings on devices that aren't supported by vanilla GamepadUI in steam.",
+  "scripts": {
+    "build": "shx rm -rf dist && rollup -c",
+    "watch": "rollup -c -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShadowBlip/HandyPT.git"
+  },
+  "keywords": [
+    "decky",
+    "plugin",
+    "Aya",
+    "Neo",
+    "AyaNeo",
+    "OXP",
+    "OneXPlayer",
+    "AOKZOE",
+    "GPD",
+    "handheld",
+    "TDP",
+    "power"
+  ],
+  "author": "Derek Clark <derekjohn.clark@gmail.com>",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/ShadowBlip/HandyPT/issues"
+  },
+  "homepage": "https://github.com/ShadowBlip/HandyPT#readme",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^21.1.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@rollup/plugin-replace": "^4.0.0",
+    "@rollup/plugin-typescript": "^8.3.3",
+    "@types/react": "16.14.0",
+    "@types/webpack": "^5.28.0",
+    "rollup": "^2.77.1",
+    "rollup-plugin-import-assets": "^1.1.1",
+    "shx": "^0.3.4",
+    "tslib": "^2.4.0",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "decky-frontend-lib": "^3.6.1",
+    "react-icons": "^4.4.0"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "react",
+        "react-dom"
+      ]
+    }
+  }
+}
