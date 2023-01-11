@@ -36,7 +36,7 @@ class Plugin:
 
     gpuclk_notches = {}
     modified_settings = False
-    persistent = False 
+    persistent = False
     sys_id = None
     tdp_delta = 2
     tdp_notches = {}
