@@ -42,9 +42,9 @@ intel_prop_dict = {
 class Plugin:
     modified_settings = False
     persistent = False
-
-    async def _main(self):
-        asyncio.sleep(5)
+    def __init__()
+        pass
+        #TODO: ryzenadj controller client, persistance.
         ## startup: load & apply settings
         #if os.path.exists(SETTINGS_LOCATION):
         #    settings = read_json(SETTINGS_LOCATION)
@@ -68,18 +68,22 @@ class Plugin:
         #    write_gpu_prop("c", settings["gpu"]["fastppt"])
         #    self.tdp_delta = settings["gpu"]["tdp_delta"]
 
-    async def get_bat_param(bat_path: str, param: str) -> int:
+    async def _main(self):
+        self.__init__()
+        asyncio.sleep(5)
+
+    async def get_bat_param(self, bat_path: str, param: str) -> int:
         return open(f'/sys/class/power_supply/{bat_path}/{param}', "r").read().strip()
 
-    async def get_cpu_clk_range() -> dict:
+    async def get_cpu_clk_range(self) -> dict:
         match await self.get_cpu_id():
             case _:
                 return None
 
-    async def get_cpu_id() -> str:
+    async def get_cpu_id(self) -> str:
         return await self.get_cpu_info("model name")
 
-    async def get_cpu_info(param: str) -> str:
+    async def get_cpu_info(self, param: str) -> str:
         command = "cat /proc/cpuinfo"
         all_info = subprocess.check_output(command, shell=True).decode().strip()
         for line in all_info.split("\n"):
@@ -87,26 +91,26 @@ class Plugin:
                 return line.split(":")[1].strip()
         return None
 
-    async def get_cpu_vendor():
+    async def get_cpu_vendor(self):
         return await self.get_cpu_info("vendor_id")
 
-    async def get_gpu_clk_range():
+    async def get_gpu_clk_range(self):
         match await self.get_cpu_id():
             case _:
                 return None
 
-    async def get_tdp_range():
+    async def get_tdp_range(self):
         match await self.get_cpu_id():
             case _:
                 return None
 
-    async def get_version() -> str:
+    async def get_version(self) -> str:
         return VERSION
 
-    async def read_amd_gpu_prop(prop: str) -> int:
+    async def read_amd_gpu_prop(self, prop: str) -> int:
         pass
 
-    async def read_gpu_prop(prop: str) -> int:
+    async def read_gpu_prop(self, prop: str) -> int:
         match await self.get_cpu_vendor():
             case "AuthenticAMD" | "AuthenticaMD Advanced Micro Devices, Inc.":
                 return await self.read_amd_gpu_prop(prop)
@@ -115,34 +119,36 @@ class Plugin:
             case _:
                 return None
 
-    async def read_intel_gpu_prop(prop: str) -> int:
+    async def read_intel_prop(self, prop: str) -> int:
+        command = intel_prop_dict[prop]
+        return system_id = open("/sys/class/powercap/intel-rapl/intel-rapl:0/{command}", "r").read().strip()
+
+    async def read_json(self, path: str):
         pass
 
-    async def read_json(path: str):
-        pass
-
-    async def read_sys_id() -> str:
+    async def read_sys_id(slf) -> str:
         return system_id = open("/sys/devices/virtual/dmi/id/product_name", "r").read().strip()
 
-    async def write_amd_gpu_prop(prop: str, value: int):
+    async def write_amd_prop(self, prop: str, value: int):
         pass
 
-    async def write_cpu_prop(prop: str):
-        # smtOff, smtOn, cpuBoostOff, cpuBoostOn
-        command = "sudo {powertools-path} {prop}"
+    async def write_cpu_prop(self, prop: str, value):
+        # smt off|on, cpuBoost 0|1 intelSetTDP<Long|Short|Peak> value
+        command = "sudo {powertools-path} {prop} {value}"
         result = subprocess.check_output(command, shell=True).decode().strip()
 
-    async def write_gpu_prop(prop: str, value: int):
+    async def write_gpu_prop(self, prop: str, value: int):
         match await self.get_cpu_vendor():
             case "AuthenticAMD" | "AuthenticaMD Advanced Micro Devices, Inc.":
-                await self.write_amd_gpu_prop(prop, value)
+                await self.write_amd_prop(prop, value)
             case "GenuineIntel":
-                await self.write_intel_gpu_prop(prop, value)
+                await self.write_intel_prop(prop, value)
             case _:
                 pass
 
-    async def write_intel_gpu_prop(prop: str, value: int):
-        pass
+    async def write_intel_prop(self, prop: str, value: int):
+        command = intel_prop_dict[prop]
+        await self.write_cpu_prop(command, value)
 
-    async def write_json(path, data):
+    async def write_json(self, path, data):
         pass
