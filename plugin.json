@@ -1,0 +1,14 @@
+{
+  "plugin.id": "handypt",
+  "plugin.name": "HandyPT",
+  "plugin.version": "0.0.1",
+  "plugin.min-api-version": "1.0.0",
+  "plugin.link": "https://github.com/ShadowBlip/HandyPT",
+  "plugin.source": "https://github.com/ShadowBlip/HandyPT",
+  "plugin.description": "CPU and GPU power tuning tools for OpenGamepadUI",
+  "store.tags": [],
+  "store.images": [],
+  "author.name": "Derek Clark",
+  "author.email": "derekjohn.clark@gmail.com",
+  "entrypoint": "plugin.gd"
+}

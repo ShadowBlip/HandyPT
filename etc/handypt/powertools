@@ -1,0 +1,51 @@
+#!/bin/bash
+
+set -eu
+
+if [[ $EUID -ne 0 ]]; then
+  exec pkexec --disable-internal-agent "$0" "$@"
+fi
+cpuBoost(){
+  /usr/bin/echo $1 > /sys/devices/system/cpu/cpufreq/boost
+}
+
+intelSetTDPLong(){
+  /usr/bin/echo $1 > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_0_power_limit_uw
+}
+
+intelSetTDPShort(){
+  /usr/bin/echo $1 > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
+}
+
+intelSetTDPPeak(){
+  /usr/bin/echo $1 > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_2_power_limit_uw
+}
+ryzenadj_long(){
+  /usr/bin/ryzenadj $1 $2
+}
+ryzenadj_short(){
+  /usr/bin/ryzenadj $1
+}
+smt(){
+  /usr/bin/echo $1 > /sys/devices/system/cpu/smt/control
+}
+
+if [[ $1 == "cpuBoost" ]]; then
+  cpuBoost $2
+elif [[ $1 == "constraint_0_power_limit_uw" ]]; then
+  intelSetTDPLong $2
+elif [[ $1 == "constraint_1_power_limit_uw" ]]; then
+  intelSetTDPShort $2
+elif [[ $1 == "constraint_2_power_limit_uw" ]]; then
+  intelSetTDPPeak $2
+elif [[ $1 == "ryzenadj" ]]; then
+  if [[ $# > 2 ]]; then
+  ryzenadj_long $2 $3
+  else
+    ryzenadj_short $2
+  fi
+elif [[ $1 == "smt" ]]; then
+  smt $2
+fi
+
+
