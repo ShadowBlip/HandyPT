@@ -5,8 +5,13 @@ set -eu
 if [[ $EUID -ne 0 ]]; then
   exec pkexec --disable-internal-agent "$0" "$@"
 fi
+
 cpuBoost(){
   /usr/bin/echo $1 > /sys/devices/system/cpu/cpufreq/boost
+}
+
+cpuPower(){
+  /usr/bin/cpupower $1 $2 $3
 }
 
 gpuClock(){
@@ -46,6 +51,9 @@ smt(){
 
 if [[ $1 == "cpuBoost" ]]; then
   cpuBoost $2
+
+elif [[ $1 == "cpupower" ]]; then
+  cpuPower $2 $3 $4
 
 elif [[ $1 == "gpuclk" ]]; then
   gpuClock $2 $3

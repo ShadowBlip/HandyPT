@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://plugins/handypt/core/powertools_menu.gd" id="1_difrc"]
 
-[sub_resource type="Theme" id="Theme_s1n11"]
+[sub_resource type="Theme" id="Theme_tlln8"]
 
 [node name="PowerTools" type="VBoxContainer"]
 anchors_preset = 15
@@ -19,84 +19,87 @@ text = "CPU Settings:
 
 [node name="SMTButton" type="CheckButton" parent="."]
 layout_mode = 2
-theme = SubResource("Theme_s1n11")
+theme = SubResource("Theme_tlln8")
 text = "SMT
 "
 
 [node name="CPUBoostButton" type="CheckButton" parent="."]
 layout_mode = 2
-theme = SubResource("Theme_s1n11")
+theme = SubResource("Theme_tlln8")
 text = "CPU Boost
 "
-
-[node name="CPUFreqEnableButton" type="CheckButton" parent="."]
-visible = false
-layout_mode = 2
-theme = SubResource("Theme_s1n11")
-disabled = true
-text = "Manual CPU Clock"
-
-[node name="CPUFreqMinLabel" type="Label" parent="."]
-visible = false
-layout_mode = 2
-text = "  CPU Clock Min"
-
-[node name="CPUFreqMinSlider" type="HSlider" parent="."]
-visible = false
-layout_mode = 2
-min_value = 300.0
-max_value = 3000.0
-step = 100.0
-value = 300.0
-editable = false
-
-[node name="CPUFreqMaxLabel" type="Label" parent="."]
-visible = false
-layout_mode = 2
-text = "  CPU Clock Max"
-
-[node name="CPUFreqMaxSlider" type="HSlider" parent="."]
-visible = false
-layout_mode = 2
-min_value = 300.0
-max_value = 3000.0
-step = 100.0
-value = 300.0
-editable = false
 
 [node name="GPUSectionLabel" type="Label" parent="."]
 layout_mode = 2
 text = "GPU Settings:
 "
 
-[node name="TDPLabel" type="Label" parent="."]
+[node name="TDPLabelContainer" type="HBoxContainer" parent="."]
 layout_mode = 2
+
+[node name="TDPLabel" type="Label" parent="TDPLabelContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
 text = "  TDP"
+
+[node name="TDPValueLabel" type="Label" parent="TDPLabelContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "0"
 
 [node name="TDPSlider" type="HSlider" parent="."]
 layout_mode = 2
 min_value = 5.0
 max_value = 32.0
 value = 5.0
-editable = false
 
-[node name="TDPBoostLabel" type="Label" parent="."]
+[node name="TDPBoostLabelContainer" type="HBoxContainer" parent="."]
 layout_mode = 2
+
+[node name="TDPBoostLabel" type="Label" parent="TDPBoostLabelContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
 text = "  TDP Boost"
+
+[node name="TDPBoostValueLabel" type="Label" parent="TDPBoostLabelContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "0"
 
 [node name="TDPBoostSlider" type="HSlider" parent="."]
 layout_mode = 2
 max_value = 8.0
-editable = false
 
 [node name="GPUFreqEnableButton" type="CheckButton" parent="."]
 layout_mode = 2
-theme = SubResource("Theme_s1n11")
+theme = SubResource("Theme_tlln8")
 text = "Manual GPU Clock"
 
-[node name="GPUFreqMinLabel" type="Label" parent="."]
+[node name="GPUFreqMinLabelContainer" type="HBoxContainer" parent="."]
 layout_mode = 2
-text = "  GPU Clock Min"
+
+[node name="GPUFreqMinLabel" type="Label" parent="GPUFreqMinLabelContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Min Freq"
+
+[node name="GPUFreqMinValueLabel" type="Label" parent="GPUFreqMinLabelContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "0"
+
+[node name="GPUFreqMaxLabelContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="GPUFreqMaxLabel" type="Label" parent="GPUFreqMaxLabelContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Min Freq"
+
+[node name="GPUFreqMaxValueLabel" type="Label" parent="GPUFreqMaxLabelContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "0"
 
 [node name="GPUFreqMinSlider" type="HSlider" parent="."]
 layout_mode = 2
@@ -105,10 +108,6 @@ max_value = 3000.0
 step = 100.0
 value = 300.0
 editable = false
-
-[node name="GPUFreqMaxLabel" type="Label" parent="."]
-layout_mode = 2
-text = "  GPU Clock Max"
 
 [node name="GPUFreqMaxSlider" type="HSlider" parent="."]
 layout_mode = 2
