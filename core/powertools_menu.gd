@@ -67,6 +67,9 @@ func _on_get_current_apu_settings() -> bool:
 func _on_max_gpu_freq_changed(value: float):
 	if value < gpu_freq_min_slider.value:
 		gpu_freq_min_slider.value = value
+	var output = []
+	var args = ["gpuclk", "1", str(value)]
+	var exit_code := OS.execute(powertools_path, args, output)
 	gpu_freq_max_value_label.text = str(value)
 
 
@@ -80,8 +83,8 @@ func _on_min_gpu_freq_changed(value: float):
 
 
 func _on_tdp_boost_value_changed(value: float):
-	var slowPPT: float = floor(value/2) + tdp_slider.value
-	var fastPPT: float = value + tdp_slider.value
+	var slowPPT: float = (floor(value/2) + tdp_slider.value) * 1000
+	var fastPPT: float = (value + tdp_slider.value) * 1000
 	var output = []
 	var exit_code := OS.execute(powertools_path, ["ryzenadj", "-c", str(fastPPT)], output)
 	exit_code = OS.execute(powertools_path, ["ryzenadj", "-a", str(slowPPT)], output)
@@ -90,7 +93,7 @@ func _on_tdp_boost_value_changed(value: float):
 
 func _on_tdp_value_changed(value: float):
 	var output = []
-	var exit_code := OS.execute(powertools_path, ["ryzenadj", "-b", str(value)], output)
+	var exit_code := OS.execute(powertools_path, ["ryzenadj", "-b", str(value + 1000)], output)
 	_on_tdp_boost_value_changed(tdp_boost_slider.value)
 	tdp_value_label.text = str(value)
 

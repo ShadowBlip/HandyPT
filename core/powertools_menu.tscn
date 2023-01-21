@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://plugins/handypt/core/powertools_menu.gd" id="1_difrc"]
 
-[sub_resource type="Theme" id="Theme_tlln8"]
+[sub_resource type="Theme" id="Theme_nlodx"]
 
 [node name="PowerTools" type="VBoxContainer"]
 anchors_preset = 15
@@ -19,13 +19,13 @@ text = "CPU Settings:
 
 [node name="SMTButton" type="CheckButton" parent="."]
 layout_mode = 2
-theme = SubResource("Theme_tlln8")
+theme = SubResource("Theme_nlodx")
 text = "SMT
 "
 
 [node name="CPUBoostButton" type="CheckButton" parent="."]
 layout_mode = 2
-theme = SubResource("Theme_tlln8")
+theme = SubResource("Theme_nlodx")
 text = "CPU Boost
 "
 
@@ -39,7 +39,7 @@ layout_mode = 2
 
 [node name="TDPLabel" type="Label" parent="TDPLabelContainer"]
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 3
 text = "  TDP"
 
 [node name="TDPValueLabel" type="Label" parent="TDPLabelContainer"]
@@ -58,7 +58,7 @@ layout_mode = 2
 
 [node name="TDPBoostLabel" type="Label" parent="TDPBoostLabelContainer"]
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 3
 text = "  TDP Boost"
 
 [node name="TDPBoostValueLabel" type="Label" parent="TDPBoostLabelContainer"]
@@ -72,7 +72,7 @@ max_value = 8.0
 
 [node name="GPUFreqEnableButton" type="CheckButton" parent="."]
 layout_mode = 2
-theme = SubResource("Theme_tlln8")
+theme = SubResource("Theme_nlodx")
 text = "Manual GPU Clock"
 
 [node name="GPUFreqMinLabelContainer" type="HBoxContainer" parent="."]
@@ -80,7 +80,7 @@ layout_mode = 2
 
 [node name="GPUFreqMinLabel" type="Label" parent="GPUFreqMinLabelContainer"]
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 3
 text = "Min Freq"
 
 [node name="GPUFreqMinValueLabel" type="Label" parent="GPUFreqMinLabelContainer"]
@@ -93,7 +93,7 @@ layout_mode = 2
 
 [node name="GPUFreqMaxLabel" type="Label" parent="GPUFreqMaxLabelContainer"]
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 3
 text = "Min Freq"
 
 [node name="GPUFreqMaxValueLabel" type="Label" parent="GPUFreqMaxLabelContainer"]
