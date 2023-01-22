@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://plugins/handypt/core/powertools_menu.gd" id="1_difrc"]
 
-[sub_resource type="Theme" id="Theme_nlodx"]
+[sub_resource type="Theme" id="Theme_7bkj8"]
 
 [node name="PowerTools" type="VBoxContainer"]
 anchors_preset = 15
@@ -19,13 +19,13 @@ text = "CPU Settings:
 
 [node name="SMTButton" type="CheckButton" parent="."]
 layout_mode = 2
-theme = SubResource("Theme_nlodx")
+theme = SubResource("Theme_7bkj8")
 text = "SMT
 "
 
 [node name="CPUBoostButton" type="CheckButton" parent="."]
 layout_mode = 2
-theme = SubResource("Theme_nlodx")
+theme = SubResource("Theme_7bkj8")
 text = "CPU Boost
 "
 
@@ -72,7 +72,7 @@ max_value = 8.0
 
 [node name="GPUFreqEnableButton" type="CheckButton" parent="."]
 layout_mode = 2
-theme = SubResource("Theme_nlodx")
+theme = SubResource("Theme_7bkj8")
 text = "Manual GPU Clock"
 
 [node name="GPUFreqMinLabelContainer" type="HBoxContainer" parent="."]
@@ -88,6 +88,12 @@ layout_mode = 2
 size_flags_horizontal = 8
 text = "0"
 
+[node name="GPUFreqMinSlider" type="HSlider" parent="."]
+layout_mode = 2
+max_value = 0.0
+step = 100.0
+editable = false
+
 [node name="GPUFreqMaxLabelContainer" type="HBoxContainer" parent="."]
 layout_mode = 2
 
@@ -101,18 +107,26 @@ layout_mode = 2
 size_flags_horizontal = 8
 text = "0"
 
-[node name="GPUFreqMinSlider" type="HSlider" parent="."]
-layout_mode = 2
-min_value = 300.0
-max_value = 3000.0
-step = 100.0
-value = 300.0
-editable = false
-
 [node name="GPUFreqMaxSlider" type="HSlider" parent="."]
 layout_mode = 2
-min_value = 300.0
-max_value = 3000.0
+max_value = 0.0
 step = 100.0
-value = 300.0
 editable = false
+
+[node name="GPUTempSliderLabelContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="GPUTempLabel" type="Label" parent="GPUTempSliderLabelContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "GPU Temp Limit"
+
+[node name="GPUTempValueLabel" type="Label" parent="GPUTempSliderLabelContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "0"
+
+[node name="GPUTempSlider" type="HSlider" parent="."]
+layout_mode = 2
+min_value = 80.0
+value = 80.0

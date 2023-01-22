@@ -1,0 +1,281 @@
+{'AMD Athlon Silver 3020e with Radeon Graphics': { 
+	"max_tdp": 12,
+	"min_tdp": 2,
+	"max_boost": 6	
+	},
+    'AMD Athlon Silver 3050e with Radeon Graphics': {
+	"max_tdp": 12,
+	"min_tdp": 2,
+	"max_boost": 6	
+	},
+    'AMD Ryzen 3 2200U with Radeon Graphics': {
+	"max_tdp": 20,
+	"min_tdp": 2,
+	"max_boost": 5	
+	},
+    'AMD Ryzen 3 2300U with Radeon Graphics': {
+	"max_tdp": 25,
+	"min_tdp": 2,
+	"max_boost": 5	
+	},
+    'AMD Ryzen 3 3200U with Radeon Graphics': {
+	"max_tdp": 20,
+	"min_tdp": 2,
+	"max_boost": 5	
+	},
+    'AMD Ryzen 3 3300U with Radeon Graphics': {
+	"max_tdp": 25,
+	"min_tdp": 2,
+	"max_boost": 5	
+	},
+    'AMD Ryzen 3 4300U with Radeon Graphics': {
+	"max_tdp": 23,
+	"min_tdp": 2,
+	"max_boost": 2	
+	},
+    'AMD Ryzen 3 5125C with Radeon Graphics': {
+	"max_tdp": 15,
+	"min_tdp": 2,
+	"max_boost": 2	
+	},
+    'AMD Ryzen 3 5300U with Radeon Graphics': {
+	"max_tdp": 23,
+	"min_tdp": 5,
+	"max_boost": 2	
+	},
+    'AMD Ryzen 3 5400U with Radeon Graphics': {
+	"max_tdp": 23,
+	"min_tdp": 5,
+	"max_boost": 2	
+	},
+    'AMD Ryzen 3 5425C with Radeon Graphics': {
+	"max_tdp": 23,
+	"min_tdp": 5,
+	"max_boost": 2	
+	},
+    'AMD Ryzen 3 5425U with Radeon Graphics': {
+	"max_tdp": 15,
+	"min_tdp": 2,
+	"max_boost": 2	
+	},
+    'AMD Ryzen 5 2500U with Radeon Graphics': {
+	"max_tdp": 25,
+	"min_tdp": 5,
+	"max_boost": 5	
+	},
+    'AMD Ryzen 5 3500U with Radeon Graphics': {
+	"max_tdp": 30,
+	"min_tdp": 5,
+	"max_boost": 5	
+	},
+    'AMD Ryzen 5 3550H with Radeon Graphics': {
+	"max_tdp": 35,
+	"min_tdp": 5,
+	"max_boost": 5	
+	},
+    'AMD Ryzen 5 4500U with Radeon Graphics': {
+	"max_tdp": 28,
+	"min_tdp": 5,
+	"max_boost": 2	
+	},
+    'AMD Ryzen 5 4600H with Radeon Graphics': {
+	"max_tdp": 55,
+	"min_tdp": 5,
+	"max_boost": 11	
+	},
+    'AMD Ryzen 5 4600HS with Radeon Graphics': {
+	"max_tdp": 45,
+	"min_tdp": 5,
+	"max_boost": 11	
+	},
+    'AMD Ryzen 5 4600U with Radeon Graphics': {
+	"max_tdp": 33,
+	"min_tdp": 5,
+	"max_boost": 5	
+	},
+    'AMD Ryzen 5 5500U with Radeon Graphics': {
+	"max_tdp": 28,
+	"min_tdp": 5,
+	"max_boost": 2	
+	},
+    'AMD Ryzen 5 5560U with Radeon Graphics': {
+	"max_tdp": 28,
+	"min_tdp": 3,
+	"max_boost": 2	
+	},
+    'AMD Ryzen 5 5600H with Radeon Graphics': {
+	"max_tdp": 12,
+	"min_tdp": 2,
+	"max_boost": 6	
+	},
+    'AMD Ryzen 5 5600HS with Radeon Graphics': {
+	"max_tdp": 45,
+	"min_tdp": 5,
+	"max_boost": 11	
+	},
+    'AMD Ryzen 5 5600U with Radeon Graphics': {
+	"max_tdp": 33,
+	"min_tdp": 5,
+	"max_boost": 5	
+	},
+    'AMD Ryzen 5 5625C with Radeon Graphics': {
+	"max_tdp": 15,
+	"min_tdp": 2,
+	"max_boost": 2	
+	},
+    'AMD Ryzen 5 5625U with Radeon Graphics': {
+	"max_tdp": 33,
+	"min_tdp": 5,
+	"max_boost": 5	
+	},
+    'AMD Ryzen 5 6600H with Radeon Graphics': {
+	"max_tdp": 58,
+	"min_tdp": 5,
+	"max_boost": 10	
+	},
+    'AMD Ryzen 5 6600HS with Radeon Graphics': {
+	"max_tdp": 45,
+	"min_tdp": 5,
+	"max_boost": 11	
+	},
+    'AMD Ryzen 5 6600U with Radeon Graphics': {
+	"max_tdp": 33,
+	"min_tdp": 5,
+	"max_boost": 5	
+	},
+    'AMD Ryzen 7 2700U with Radeon Graphics': {
+	"max_tdp": 25,
+	"min_tdp": 5,
+	"max_boost": 5	
+	},
+    'AMD Ryzen 7 3700U with Radeon Graphics': {
+	"max_tdp": 30,
+	"min_tdp": 5,
+	"max_boost": 10	
+	},
+    'AMD Ryzen 7 3750H with Radeon Graphics': {
+	"max_tdp": 40,
+	"min_tdp": 5,
+	"max_boost": 10	
+	},
+    'AMD Ryzen 7 4700U with Radeon Graphics': {
+	"max_tdp": 12,
+	"min_tdp": 2,
+	"max_boost": 6	
+	},
+    'AMD Ryzen 7 4800H with Radeon Graphics': {
+	"max_tdp": 28,
+	"min_tdp": 5,
+	"max_boost": 2	
+	},
+    'AMD Ryzen 7 4800HS with Radeon Graphics': {
+	"max_tdp": 50,
+	"min_tdp": 5,
+	"max_boost": 8	
+	},
+    'AMD Ryzen 7 4800U with Radeon Graphics': {
+	"max_tdp": 33,
+	"min_tdp": 5,
+	"max_boost": 5	
+	},
+    'AMD Ryzen 7 4980U with Radeon Graphics': {
+	"max_tdp": 15,
+	"min_tdp": 10,
+	"max_boost": 10	
+	},
+    'AMD Ryzen 7 5700U with Radeon Graphics': {
+	"max_tdp": 28,
+	"min_tdp": 5,
+	"max_boost": 2	
+	},
+    'AMD Ryzen 7 5800H with Radeon Graphics': {
+	"max_tdp": 68,
+	"min_tdp": 10,
+	"max_boost": 4	
+	},
+    'AMD Ryzen 7 5800HS with Radeon Graphics': {
+	"max_tdp": 50,
+	"min_tdp": 10,
+	"max_boost": 8	
+	},
+    'AMD Ryzen 7 5800U with Radeon Graphics': {
+	"max_tdp": 33,
+	"min_tdp": 5,
+	"max_boost": 5	
+	},
+    'AMD Ryzen 7 5825C with Radeon Graphics': {
+	"max_tdp": 15,
+	"min_tdp": 10,
+	"max_boost": 10	
+	},
+    'AMD Ryzen 7 5825U with Radeon Graphics': {
+	"max_tdp": 33,
+	"min_tdp": 5,
+	"max_boost": 5	
+	},
+    'AMD Ryzen 7 6800H with Radeon Graphics': {
+	"max_tdp": 58,
+	"min_tdp": 10,
+	"max_boost": 10	
+	},
+    'AMD Ryzen 7 6800HS with Radeon Graphics': {
+	"max_tdp": 50,
+	"min_tdp": 10,
+	"max_boost": 8	
+	},
+    'AMD Ryzen 7 6800U with Radeon Graphics': {
+	"max_tdp": 33,
+	"min_tdp": 5,
+	"max_boost": 5	
+	},
+    'AMD Ryzen 9 4900H with Radeon Graphics': {
+	"max_tdp": 60,
+	"min_tdp": 10,
+	"max_boost": 8	
+	},
+    'AMD Ryzen 9 4900HS with Radeon Graphics': {
+	"max_tdp": 50,
+	"min_tdp": 5,
+	"max_boost": 8	
+	},
+    'AMD Ryzen 9 5900HS with Radeon Graphics': {
+	"max_tdp": 50,
+	"min_tdp": 10,
+	"max_boost": 8	
+	},
+    'AMD Ryzen 9 5900HX with Radeon Graphics': {
+	"max_tdp": 70,
+	"min_tdp": 10,
+	"max_boost": 20	
+	},
+    'AMD Ryzen 9 5980HS with Radeon Graphics': {
+	"max_tdp": 50,
+	"min_tdp": 10,
+	"max_boost": 8	
+	},
+    'AMD Ryzen 9 5980HX with Radeon Graphics': {
+	"max_tdp": 70,
+	"min_tdp": 10,
+	"max_boost": 20	
+	},
+    'AMD Ryzen 9 6900HS with Radeon Graphics': {
+	"max_tdp": 50,
+	"min_tdp": 10,
+	"max_boost": 8	
+	},
+    'AMD Ryzen 9 6900HX with Radeon Graphics': {
+	"max_tdp": 70,
+	"min_tdp": 10,
+	"max_boost": 20	
+	},
+    'AMD Ryzen 9 6980HS with Radeon Graphics': {
+	"max_tdp": 50,
+	"min_tdp": 10,
+	"max_boost": 8	
+	},
+    'AMD Ryzen 9 6980HX with Radeon Graphics': {
+	"max_tdp": 70,
+	"min_tdp": 10,
+	"max_boost": 20	
+	}
+}
