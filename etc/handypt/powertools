@@ -49,6 +49,10 @@ smt(){
   /usr/bin/echo $1 > /sys/devices/system/cpu/smt/control
 }
 
+toggleCPU(){
+ /usr/bin/echo $2 > /sys/bus/cpu/devices/cpu${1}/online
+}
+
 if [[ $1 == "cpuBoost" ]]; then
   cpuBoost $2
 
@@ -84,4 +88,6 @@ elif [[ $1 == "ryzenadj" ]]; then
 elif [[ $1 == "smt" ]]; then
   smt $2
 
+elif [[ $1 == "togglecpu" ]]; then
+  toggleCPU $2 $3
 fi

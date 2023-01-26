@@ -2,29 +2,28 @@ extends VBoxContainer
 
 const powertools_path : String = "/etc/handypt/powertools"
 
-@onready var cpu_boost_button := $CPUBoostButton
-@onready var gpu_freq_enable := $GPUFreqEnableButton
+var core_count := 0
+
+@onready var cpu_boost_button := $CPUBoost/Button
+@onready var cpu_cores_slider := $CPUCoresSlider
+@onready var cpu_cores_value_label := $CPUCoreLabels/Value
+@onready var gpu_freq_enable := $GPUFreqEnable/Button
 @onready var gpu_freq_max_slider := $GPUFreqMaxSlider
-@onready var gpu_freq_max_value_label := $GPUFreqMaxLabelContainer/GPUFreqMaxValueLabel
+@onready var gpu_freq_max_value_label := $GPUFreqMaxLabels/Value
 @onready var gpu_freq_min_slider := $GPUFreqMinSlider
-@onready var gpu_freq_min_value_label := $GPUFreqMinLabelContainer/GPUFreqMinValueLabel
+@onready var gpu_freq_min_value_label := $GPUFreqMinLabels/Value
 @onready var gpu_temp_slider := $GPUTempSlider
-@onready var gpu_temp_slider_value_label :=$GPUTempSliderLabelContainer/GPUTempValueLabel
-@onready var smt_button := $SMTButton
+@onready var gpu_temp_slider_value_label := $GPUTempLabels/Values
+@onready var smt_button := $SMT/Button
 @onready var tdp_boost_slider := $TDPBoostSlider
-@onready var tdp_boost_value_label := $TDPBoostLabelContainer/TDPBoostValueLabel
+@onready var tdp_boost_value_label := $TDPBoostLabels/Value
 @onready var tdp_slider := $TDPSlider
-@onready var tdp_value_label := $TDPLabelContainer/TDPValueLabel
+@onready var tdp_value_label := $TDPLabels/Value
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 
-	# Find defaults and current settings.
-	_get_tdp_range()
-	_get_current_tdp_settings()
-	_get_gpu_clk_limits()
-	
 	if read_sys("/sys/devices/system/cpu/cpufreq/boost") == "1":
 		cpu_boost_button.button_pressed = true
 	if read_sys("/sys/class/drm/card0/device/power_dpm_force_performance_level") == "manual":
@@ -34,8 +33,15 @@ func _ready():
 	if read_sys("/sys/devices/system/cpu/smt/control") == "on":
 		smt_button.button_pressed = true
 	
+	# Find defaults and current settings.
+	_get_tdp_range()
+	_get_current_tdp_settings()
+	_get_gpu_clk_limits()
+	_get_cpu_count()
+
 	# Connect Signals
 	cpu_boost_button.toggled.connect(_on_toggle_cpu_boost)
+	cpu_cores_slider.value_changed.connect(_on_change_cpu_cores)
 	gpu_freq_enable.toggled.connect(_on_toggle_gpu_freq)
 	gpu_freq_max_slider.value_changed.connect(_on_max_gpu_freq_changed)
 	gpu_freq_min_slider.value_changed.connect(_on_min_gpu_freq_changed)
@@ -60,6 +66,34 @@ func read_sys(path: String) -> String:
 	return output[0].strip_escapes()
 
 
+func _get_cpu_count() -> bool:
+	var args = ["-c", "ls /sys/bus/cpu/devices/ | wc -l"]
+	var output := []
+	var exit_code := OS.execute("bash", args, output)
+	if exit_code:
+		return false
+	var result := output[0].split("\n") as Array
+	core_count = int(result[0])
+	if smt_button.button_pressed:
+		cpu_cores_slider.max_value = core_count
+	else:
+		cpu_cores_slider.max_value = core_count / 2
+	cpu_cores_slider.value = _get_cpus_enabled()
+	cpu_cores_value_label.text = str(cpu_cores_slider.value)
+	return true
+
+
+func _get_cpus_enabled() -> int:
+	pass
+	var active_cpus := 1
+	for i in range(1, core_count):
+		var args = ["-c", "cat /sys/bus/cpu/devices/cpu"+str(i)+"/online"]
+		var output := []
+		var exit_code := OS.execute("bash", args, output)
+		active_cpus += int(output[0].strip_edges())
+	
+	return active_cpus
+
 func _get_gpu_clk_limits() -> bool:
 	var args := ["/sys/class/drm/card0/device/pp_od_clk_voltage"]
 	var output := []
@@ -74,7 +108,6 @@ func _get_gpu_clk_limits() -> bool:
 		var parts := param.split("\n") as Array
 		for part in parts:
 			part = part.strip_edges().split(" ")
-			print(part)
 			if part[0] == "SCLK:":
 				min_value = int(part[8].rstrip("Mhz"))
 				max_value = int(part[15].rstrip("Mhz"))
@@ -143,6 +176,30 @@ func _get_tdp_range() -> bool:
 	return true
 
 
+func _on_change_cpu_cores(value: float):
+	if smt_button.button_pressed:
+		print("SMT ON!")
+		for cpu_no in range(1, core_count):
+			var output := []
+			if cpu_no > cpu_cores_slider.value - 1:
+				var exit_code := OS.execute(powertools_path, ["togglecpu", str(cpu_no), "0"], output)
+			else:
+				var exit_code := OS.execute(powertools_path, ["togglecpu", str(cpu_no), "1"], output)
+			
+	else:
+		print("SMT OFF!")
+		for i in range(1, core_count/2):
+			var cpu_no := i * 2
+			var output := []
+			print(cpu_no, " ", cpu_cores_slider.value * 2 - 1)
+			if cpu_no > cpu_cores_slider.value * 2 - 1:
+				
+				var exit_code := OS.execute(powertools_path, ["togglecpu", str(cpu_no), "0"], output)
+			else:
+				var exit_code := OS.execute(powertools_path, ["togglecpu", str(cpu_no), "1"], output)
+
+	cpu_cores_value_label.text = str(_get_cpus_enabled())
+
 func _on_gpu_temp_limit_changed(value: float):
 	var output = []
 	var exit_code := OS.execute(powertools_path, ["ryzenadj", "-f", str(value)], output)
@@ -206,11 +263,23 @@ func _on_toggle_gpu_freq(state: bool):
 
 
 func _on_toggle_smt(state: bool):
-	var args := ["smt", "off"]
+	var args := []
 	if state:
 		args = ["smt", "on"]
+		cpu_cores_slider.max_value = core_count
+	else:
+		args = ["smt", "off"]
+		cpu_cores_slider.max_value = core_count / 2
+
 	var output = []
 	var exit_code := OS.execute(powertools_path, args, output)
+	
+	if exit_code:
+		return false
+		
+	cpu_cores_slider.value = _get_cpus_enabled()
+	cpu_cores_value_label.text = str(cpu_cores_slider.value)
+	return true
 
 
 var apu_database := {'AMD Athlon Silver 3020e with Radeon Graphics': { 
