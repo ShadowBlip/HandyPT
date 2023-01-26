@@ -178,7 +178,6 @@ func _get_tdp_range() -> bool:
 
 func _on_change_cpu_cores(value: float):
 	if smt_button.button_pressed:
-		print("SMT ON!")
 		for cpu_no in range(1, core_count):
 			var output := []
 			if cpu_no > cpu_cores_slider.value - 1:
@@ -187,11 +186,9 @@ func _on_change_cpu_cores(value: float):
 				var exit_code := OS.execute(powertools_path, ["togglecpu", str(cpu_no), "1"], output)
 			
 	else:
-		print("SMT OFF!")
 		for i in range(1, core_count/2):
 			var cpu_no := i * 2
 			var output := []
-			print(cpu_no, " ", cpu_cores_slider.value * 2 - 1)
 			if cpu_no > cpu_cores_slider.value * 2 - 1:
 				
 				var exit_code := OS.execute(powertools_path, ["togglecpu", str(cpu_no), "0"], output)
