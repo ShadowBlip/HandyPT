@@ -1,18 +1,22 @@
-[gd_scene load_steps=3 format=3 uid="uid://cgtqpgne2s116"]
+[gd_scene load_steps=4 format=3 uid="uid://cgtqpgne2s116"]
 
 [ext_resource type="Script" path="res://plugins/handypt/core/powertools_menu.gd" id="1_difrc"]
-
-[sub_resource type="Theme" id="Theme_dqw4t"]
+[ext_resource type="PackedScene" uid="uid://d1qb7euwlu7bh" path="res://core/ui/components/toggle.tscn" id="2_nb5h3"]
+[ext_resource type="PackedScene" uid="uid://cemxrvvjgm4g" path="res://core/ui/components/slider.tscn" id="2_ygeel"]
 
 [node name="PowerTools" type="VBoxContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 66.0
+offset_top = -116.0
+offset_right = 66.0
+offset_bottom = -116.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_difrc")
 
-[node name="HSeparator" type="HSeparator" parent="."]
+[node name="TopSeparator" type="HSeparator" parent="."]
 layout_mode = 2
 
 [node name="CPUSectionLabel" type="Label" parent="."]
@@ -20,62 +24,29 @@ layout_mode = 2
 text = "CPU Settings:
 "
 
-[node name="HSeparator5" type="HSeparator" parent="."]
+[node name="CPUSeparator" type="HSeparator" parent="."]
 layout_mode = 2
 
-[node name="CPUBoost" type="HBoxContainer" parent="."]
+[node name="CPUBoostButton" parent="." instance=ExtResource("2_nb5h3")]
+visible = false
 layout_mode = 2
-
-[node name="Label" type="Label" parent="CPUBoost"]
-layout_mode = 2
-size_flags_horizontal = 3
 text = "Boost Enabled"
+button_pressed = false
 
-[node name="Button" type="CheckButton" parent="CPUBoost"]
+[node name="SMTButton" parent="." instance=ExtResource("2_nb5h3")]
+visible = false
 layout_mode = 2
-size_flags_horizontal = 8
-theme = SubResource("Theme_dqw4t")
-text = "
-"
-
-[node name="SMT" type="HBoxContainer" parent="."]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="SMT"]
-layout_mode = 2
-size_flags_horizontal = 3
 text = "SMT Enabled"
+button_pressed = false
 
-[node name="Button" type="CheckButton" parent="SMT"]
+[node name="CPUCoresSlider" parent="." instance=ExtResource("2_ygeel")]
+visible = false
 layout_mode = 2
-size_flags_horizontal = 8
-theme = SubResource("Theme_dqw4t")
-text = "
-"
-
-[node name="HSeparator6" type="HSeparator" parent="."]
-layout_mode = 2
-
-[node name="CPUCoreLabels" type="HBoxContainer" parent="."]
-layout_mode = 2
-
-[node name="Name" type="Label" parent="CPUCoreLabels"]
-layout_mode = 2
-size_flags_horizontal = 3
 text = "CPU Cores"
-
-[node name="Value" type="Label" parent="CPUCoreLabels"]
-layout_mode = 2
-size_flags_horizontal = 8
-text = "0"
-
-[node name="CPUCoresSlider" type="HSlider" parent="."]
-layout_mode = 2
+max_value = 1.0
 min_value = 1.0
-max_value = 128.0
-value = 5.0
 
-[node name="HSeparator2" type="HSeparator" parent="."]
+[node name="GPUSeparator" type="HSeparator" parent="."]
 layout_mode = 2
 
 [node name="GPUSectionLabel" type="Label" parent="."]
@@ -83,116 +54,47 @@ layout_mode = 2
 text = "GPU Settings:
 "
 
-[node name="HSeparator7" type="HSeparator" parent="."]
+[node name="TDPSeparator2" type="HSeparator" parent="."]
 layout_mode = 2
 
-[node name="TDPLabels" type="HBoxContainer" parent="."]
+[node name="TDPSlider" parent="." instance=ExtResource("2_ygeel")]
+visible = false
 layout_mode = 2
-
-[node name="Name" type="Label" parent="TDPLabels"]
-layout_mode = 2
-size_flags_horizontal = 3
 text = "TDP"
+max_value = 0.0
 
-[node name="Value" type="Label" parent="TDPLabels"]
+[node name="TDPBoostSlider" parent="." instance=ExtResource("2_ygeel")]
+visible = false
 layout_mode = 2
-size_flags_horizontal = 8
-text = "0"
-
-[node name="TDPSlider" type="HSlider" parent="."]
-layout_mode = 2
-min_value = 5.0
-max_value = 32.0
-value = 5.0
-
-[node name="TDPBoostLabels" type="HBoxContainer" parent="."]
-layout_mode = 2
-
-[node name="Name" type="Label" parent="TDPBoostLabels"]
-layout_mode = 2
-size_flags_horizontal = 3
 text = "TDP Boost"
+max_value = 0.0
 
-[node name="Value" type="Label" parent="TDPBoostLabels"]
+[node name="GPUFreqButton" parent="." instance=ExtResource("2_nb5h3")]
+visible = false
 layout_mode = 2
-size_flags_horizontal = 8
-text = "0"
-
-[node name="TDPBoostSlider" type="HSlider" parent="."]
-layout_mode = 2
-max_value = 8.0
-
-[node name="HSeparator3" type="HSeparator" parent="."]
-layout_mode = 2
-
-[node name="GPUFreqEnable" type="HBoxContainer" parent="."]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="GPUFreqEnable"]
-layout_mode = 2
-size_flags_horizontal = 3
 text = "Manual Freq"
+button_pressed = false
 
-[node name="Button" type="CheckButton" parent="GPUFreqEnable"]
+[node name="GPUFreqMinSlider" parent="." instance=ExtResource("2_ygeel")]
+visible = false
 layout_mode = 2
-size_flags_horizontal = 8
-theme = SubResource("Theme_dqw4t")
-
-[node name="GPUFreqMinLabels" type="HBoxContainer" parent="."]
-layout_mode = 2
-
-[node name="Name" type="Label" parent="GPUFreqMinLabels"]
-layout_mode = 2
-size_flags_horizontal = 3
 text = "Min Freq"
-
-[node name="Value" type="Label" parent="GPUFreqMinLabels"]
-layout_mode = 2
-size_flags_horizontal = 8
-text = "0"
-
-[node name="GPUFreqMinSlider" type="HSlider" parent="."]
-layout_mode = 2
 max_value = 0.0
 step = 100.0
-editable = false
 
-[node name="GPUFreqMaxLabels" type="HBoxContainer" parent="."]
+[node name="GPUFreqMaxSlider" parent="." instance=ExtResource("2_ygeel")]
+visible = false
 layout_mode = 2
-
-[node name="Name" type="Label" parent="GPUFreqMaxLabels"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Min Freq"
-
-[node name="Value" type="Label" parent="GPUFreqMaxLabels"]
-layout_mode = 2
-size_flags_horizontal = 8
-text = "0"
-
-[node name="GPUFreqMaxSlider" type="HSlider" parent="."]
-layout_mode = 2
+text = "Max Freq"
 max_value = 0.0
 step = 100.0
-editable = false
 
-[node name="HSeparator4" type="HSeparator" parent="."]
+[node name="GPUTempSlider" parent="." instance=ExtResource("2_ygeel")]
+visible = false
 layout_mode = 2
-
-[node name="GPUTempLabels" type="HBoxContainer" parent="."]
-layout_mode = 2
-
-[node name="Name" type="Label" parent="GPUTempLabels"]
-layout_mode = 2
-size_flags_horizontal = 3
 text = "GPU Temp Limit"
+max_value = 105.0
+min_value = 70.0
 
-[node name="Values" type="Label" parent="GPUTempLabels"]
+[node name="BottomSeparator" type="HSeparator" parent="."]
 layout_mode = 2
-size_flags_horizontal = 8
-text = "0"
-
-[node name="GPUTempSlider" type="HSlider" parent="."]
-layout_mode = 2
-min_value = 80.0
-value = 80.0
