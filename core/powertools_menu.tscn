@@ -40,6 +40,7 @@ focus_previous = NodePath("../GPUTempSlider")
 focus_mode = 2
 text = "Boost Enabled"
 button_pressed = false
+disabled = null
 
 [node name="SMTButton" parent="." instance=ExtResource("2_nb5h3")]
 visible = false
@@ -53,6 +54,7 @@ focus_previous = NodePath("../CPUBoostButton")
 focus_mode = 2
 text = "SMT Enabled"
 button_pressed = false
+disabled = null
 
 [node name="CPUCoresSlider" parent="." instance=ExtResource("2_ygeel")]
 visible = false
@@ -117,6 +119,7 @@ focus_previous = NodePath("../TDPBoostSlider")
 focus_mode = 2
 text = "Manual Freq"
 button_pressed = false
+disabled = null
 
 [node name="GPUFreqMinSlider" parent="." instance=ExtResource("2_ygeel")]
 visible = false
