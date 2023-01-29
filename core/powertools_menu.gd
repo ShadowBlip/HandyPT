@@ -24,6 +24,7 @@ var tj_temp_capable := false
 @onready var tdp_boost_slider := $TDPBoostSlider
 @onready var tdp_slider := $TDPSlider
 
+@export var focus_node : Node = $CPUBoostButton
 
 # Called when the node enters the scene tree for the first time.
 # Finds default values and current settings of the hardware.
@@ -291,6 +292,12 @@ func _on_min_gpu_freq_changed(value: float) -> bool:
 	if exit_code:
 		return false
 	return true
+
+
+func _on_pressed() -> void:
+	print("Focus!")
+	focus_node.grab_focus()
+
 
 func _on_tdp_boost_value_changed(value: float) -> bool:
 	var slowPPT: float = (floor(value/2) + tdp_slider.value) * 1000
