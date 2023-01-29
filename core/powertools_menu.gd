@@ -13,7 +13,6 @@ var ht_capable := false
 var tdp_capable := false
 var tj_temp_capable := false
 
-@onready var test_slider := $Slider
 @onready var cpu_boost_button := $CPUBoostButton
 @onready var cpu_cores_slider := $CPUCoresSlider
 @onready var gpu_freq_enable := $GPUFreqButton
@@ -295,7 +294,6 @@ func _on_min_gpu_freq_changed(value: float) -> bool:
 
 
 func _on_pressed() -> void:
-	print("Focus!")
 	focus_node.grab_focus()
 
 
